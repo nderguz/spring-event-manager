@@ -1,5 +1,6 @@
 package org.example.eventmanager.location;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.eventmanager.location.entities.EntityConverter;
 import org.example.eventmanager.location.entities.LocationDto;
@@ -22,33 +23,25 @@ public class LocationController {
     }
 
     @PostMapping("/locations")
-    public ResponseEntity<LocationDto> createLocation(@RequestBody LocationDto locationDto){
+    public ResponseEntity<LocationDto> createLocation(@Valid @RequestBody LocationDto locationDto){
         var location = locationService.createLocation(entityConverter.toEntity(locationDto));
         return ResponseEntity.ok(entityConverter.toDto(location));
     }
 
     @DeleteMapping("/locations/{locationId}")
     public ResponseEntity<String> deleteLocation(@PathVariable Long locationId){
-        try {
-            locationService.deleteLocation(locationId);
-            return ResponseEntity.ok("Deleted location with id " + locationId);
-        }catch (IllegalArgumentException e){
-            throw new IllegalArgumentException("Invalid location id " + locationId);
-        }
+        locationService.deleteLocation(locationId);
+        return ResponseEntity.ok("Deleted location with id " + locationId);
     }
 
     @GetMapping("/locations/{locationId}")
     public ResponseEntity<LocationDto> getLocation(@PathVariable Long locationId){
-        try {
-            var foundLocation = locationService.getLocationById(locationId);
-            return ResponseEntity.ok(entityConverter.toDto(foundLocation));
-        }catch (IllegalArgumentException e){
-            throw new IllegalArgumentException("Invalid location id " + locationId);
-        }
+        var foundLocation = locationService.getLocationById(locationId);
+        return ResponseEntity.ok(entityConverter.toDto(foundLocation));
     }
 
     @PutMapping("/locations/{locationId}")
-    public ResponseEntity<LocationDto> updateLocation(@PathVariable Long locationId, @RequestBody LocationDto locationDto){
+    public ResponseEntity<LocationDto> updateLocation(@PathVariable Long locationId, @Valid @RequestBody LocationDto locationDto){
         locationService.updateLocation(locationId, entityConverter.toEntity(locationDto));
         return ResponseEntity.ok(entityConverter.toDto(locationService.getLocationById(locationId)));
     }
