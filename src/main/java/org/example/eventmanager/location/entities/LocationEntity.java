@@ -36,7 +36,7 @@ public class LocationEntity {
     @Column(nullable = false,
             name = "location_adress")
     private String address;
-    private int capacity;
+    private Long capacity;
     private String description;
 
 }

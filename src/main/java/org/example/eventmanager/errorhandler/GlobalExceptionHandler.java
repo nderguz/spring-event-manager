@@ -31,4 +31,14 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ServerMessageHelper> handleException(final Exception ex) {
+        var message = new ServerMessageHelper(
+                "Внутренняя ошибка сервера",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+    }
 }

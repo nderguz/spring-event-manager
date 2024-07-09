@@ -14,7 +14,7 @@ public record LocationDto(
         String address,
 
         @Min(value = 1, message = "Capacity must be greater than 0")
-        int capacity,
+        Long capacity,
 
         String description
 ) {
