@@ -1,5 +1,9 @@
 package org.example.eventmanager.users;
 
-//@Repository
-//public interface UserRepository extends JpaRepository<UserEntity, Long> {
-//}
+import org.example.eventmanager.users.entities.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+}
