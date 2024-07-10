@@ -40,7 +40,6 @@ public class LocationService {
                 .formatted(locationId)));
         return entityMapper.toDomain(foundEntityById);
     }
-
     public Location updateLocation(Long locationId,Location locationToUpdate) {
         if (locationToUpdate.Id() != null) {
             throw new IllegalArgumentException("Can not update location with provided ID.");
