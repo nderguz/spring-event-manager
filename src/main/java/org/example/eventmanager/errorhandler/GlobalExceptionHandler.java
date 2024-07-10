@@ -1,6 +1,8 @@
 package org.example.eventmanager.errorhandler;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,18 +14,33 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<ServerMessageHelper> handleMethodArgumentNotValidException(final MethodArgumentNotValidException ex) {
+    private final static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<ServerMessageHelper> handleMethodArgumentNotValidException(final IllegalArgumentException ex) {
+        log.error("Handle illegal argument exception", ex);
         var message = new ServerMessageHelper(
-                "Некорректный запрос",
+                "Выполнен запрос с невалидными данными",
                 ex.getMessage(),
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
-    @ExceptionHandler(value = {EntityNotFoundException.class})
+    @ExceptionHandler(value = IllegalStateException.class)
+    public ResponseEntity<ServerMessageHelper> handleIllegalStateException(final IllegalStateException ex) {
+        log.error("Handle illegal state exception", ex);
+        var message = new ServerMessageHelper(
+                "Выполнен запрос с невалидными данными",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<ServerMessageHelper> handleEntityNotFoundException(final EntityNotFoundException ex) {
+        log.error("Handle not found exception", ex);
         var message = new ServerMessageHelper(
                 "Сущность не найдена",
                 ex.getMessage(),
@@ -32,8 +49,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ServerMessageHelper> handleException(final Exception ex) {
+        log.error("Handle common exception", ex);
         var message = new ServerMessageHelper(
                 "Внутренняя ошибка сервера",
                 ex.getMessage(),

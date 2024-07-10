@@ -1,7 +1,9 @@
 package org.example.eventmanager.location;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.location.entities.LocationEntity;
+import org.example.eventmanager.location.entities.EntityMapper;
+import org.example.eventmanager.location.entities.Location;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -10,27 +12,47 @@ import java.util.List;
 public class LocationService {
 
     private final LocationRepository locationRepository;
+    private final EntityMapper entityMapper;
 
-    public List<LocationEntity> getLocations() {
-        return locationRepository.findAll();
+    public List<Location> getLocations() {
+        return locationRepository.findAll().stream()
+                .map(entityMapper::toDomain)
+                .toList();
     }
 
-    public LocationEntity createLocation(LocationEntity locationEntity) {
-        locationRepository.save(locationEntity);
-        return locationEntity;
+    public Location createLocation(Location locationToCreate) {
+        if(locationToCreate.Id() != null){
+            throw new IllegalArgumentException("Can not create location with provided ID.");
+        }
+        var createdLocation = locationRepository.save(entityMapper.toEntity(locationToCreate));
+        return entityMapper.toDomain(createdLocation);
     }
 
-    public void deleteLocation(Long id) {
-        locationRepository.deleteById(id);
-    }
-
-    public LocationEntity getLocationById(Long locationId) {
-        return locationRepository.getReferenceById(locationId);
-    }
-
-    public LocationEntity updateLocation(Long locationId,LocationEntity locationEntity) {
+    public Location deleteLocation(Long locationId) {
+        var entityToDelete = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
+                .formatted(locationId)));
         locationRepository.deleteById(locationId);
-        locationRepository.save(locationEntity);
-        return locationEntity;
+        return entityMapper.toDomain(entityToDelete);
+    }
+
+    public Location getLocationById(Long locationId) {
+        var foundEntityById = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
+                .formatted(locationId)));
+        return entityMapper.toDomain(foundEntityById);
+    }
+
+    public Location updateLocation(Long locationId,Location locationToUpdate) {
+        if (locationToUpdate.Id() != null) {
+            throw new IllegalArgumentException("Can not update location with provided ID.");
+        }
+        var entityToUpdate = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
+                .formatted(locationId)));
+        entityToUpdate.setAddress(locationToUpdate.address());
+        entityToUpdate.setName(locationToUpdate.name());
+        entityToUpdate.setCapacity(locationToUpdate.capacity());
+        entityToUpdate.setDescription(locationToUpdate.description());
+
+        var updatedLocation = locationRepository.save(entityToUpdate);
+        return entityMapper.toDomain(updatedLocation);
     }
 }

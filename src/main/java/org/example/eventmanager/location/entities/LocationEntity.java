@@ -1,42 +1,37 @@
 package org.example.eventmanager.location.entities;
-
+//Сущность для БД
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @Entity
-@Table(name = "locations",
-        uniqueConstraints = @UniqueConstraint(
-                name = "location_unique",
-                columnNames = "location_name"
-        )
-)
+@Table(name = "locations")
 public class LocationEntity {
     @Id
-    @SequenceGenerator(
-            name = "location_sequence",
-            sequenceName = "location_sequence",
-            allocationSize = 1
-    )
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "location_sequence"
+            strategy = GenerationType.IDENTITY
     )
+    @Column(name = "location_id")
     private Long Id;
+
     @Column(name = "location_name",
             nullable = false
     )
     private String name;
+
     @Column(nullable = false,
             name = "location_adress")
     private String address;
+
+    @Column(name = "capacity")
     private Long capacity;
+
+    @Column(name = "description")
     private String description;
 
 }

@@ -2,9 +2,9 @@ package org.example.eventmanager.location.entities;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record LocationDto(
-
         Long Id,
 
         @NotBlank(message = "Location name cannot be empty")
@@ -13,7 +13,8 @@ public record LocationDto(
         @NotBlank(message = "Location address cannot be empty")
         String address,
 
-        @Min(value = 1, message = "Capacity must be greater than 0")
+        @NotNull
+        @Min(value = 5, message = "Capacity must be greater than 5")
         Long capacity,
 
         String description
