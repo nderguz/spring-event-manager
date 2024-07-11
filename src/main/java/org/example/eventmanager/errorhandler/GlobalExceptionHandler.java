@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.LocalDateTime;
@@ -57,5 +58,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity<ServerMessageHelper> handleBadCredentialsException(final BadCredentialsException ex) {
+        log.error("Handle bad credentials exception", ex);
+        var message = new ServerMessageHelper(
+                "Необходима аутентификация",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(401).body(message);
     }
 }

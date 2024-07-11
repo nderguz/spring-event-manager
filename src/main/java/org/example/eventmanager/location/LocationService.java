@@ -2,8 +2,8 @@ package org.example.eventmanager.location;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.location.entities.EntityMapper;
 import org.example.eventmanager.location.entities.Location;
+import org.example.eventmanager.location.entities.UniversalLocationMapper;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -12,11 +12,11 @@ import java.util.List;
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final EntityMapper entityMapper;
+    private final UniversalLocationMapper universalLocationMapper;
 
     public List<Location> getLocations() {
         return locationRepository.findAll().stream()
-                .map(entityMapper::toDomain)
+                .map(universalLocationMapper::entityToDomain)
                 .toList();
     }
 
@@ -24,21 +24,21 @@ public class LocationService {
         if(locationToCreate.Id() != null){
             throw new IllegalArgumentException("Can not create location with provided ID.");
         }
-        var createdLocation = locationRepository.save(entityMapper.toEntity(locationToCreate));
-        return entityMapper.toDomain(createdLocation);
+        var createdLocation = locationRepository.save(universalLocationMapper.domainToEntity(locationToCreate));
+        return universalLocationMapper.entityToDomain(createdLocation);
     }
 
     public Location deleteLocation(Long locationId) {
         var entityToDelete = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
                 .formatted(locationId)));
         locationRepository.deleteById(locationId);
-        return entityMapper.toDomain(entityToDelete);
+        return universalLocationMapper.entityToDomain(entityToDelete);
     }
 
     public Location getLocationById(Long locationId) {
         var foundEntityById = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
                 .formatted(locationId)));
-        return entityMapper.toDomain(foundEntityById);
+        return universalLocationMapper.entityToDomain(foundEntityById);
     }
     public Location updateLocation(Long locationId,Location locationToUpdate) {
         if (locationToUpdate.Id() != null) {
@@ -52,6 +52,6 @@ public class LocationService {
         entityToUpdate.setDescription(locationToUpdate.description());
 
         var updatedLocation = locationRepository.save(entityToUpdate);
-        return entityMapper.toDomain(updatedLocation);
+        return universalLocationMapper.entityToDomain(updatedLocation);
     }
 }

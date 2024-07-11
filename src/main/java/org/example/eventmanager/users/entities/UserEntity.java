@@ -18,13 +18,17 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_login")
+    @Column(name = "user_login", unique = true)
     private String login;
 
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(name = "age")
+    private Integer age;
+
     @Column(name = "role", nullable = false)
-//    @Enumerated(EnumType.STRING)
     private String role;
+
+
 }

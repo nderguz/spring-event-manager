@@ -1,7 +1,12 @@
 package org.example.eventmanager.users;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.users.entities.UserDto;
+import org.example.eventmanager.security.JwtTokenManager;
+import org.example.eventmanager.users.entities.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,11 +14,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
+    private final UserRegistrationService userRegistrationService;
+    private final UniversalUserMapper universalUserMapper;
+    private final JwtTokenManager jwtTokenManager;
+    private final AuthenticationService authenticationService;
 
     @PostMapping
-    public void createUser(){
+    public ResponseEntity<UserDto> registerUser(
+            @RequestBody @Valid SignUpRequest signUpRequest
+    ){
+        log.info("Request for register new user: {}", signUpRequest.login());
+        var user = userRegistrationService.registerUser(signUpRequest);
+        var token = jwtTokenManager.generateToken(user);
 
+        return ResponseEntity.status(201)
+                .body(universalUserMapper.domainToDto(user));
     }
 
     @GetMapping("/{userId}")
@@ -22,7 +39,10 @@ public class UserController {
     }
 
     @PostMapping("/auth")
-    public void userAuthentication(@RequestBody UserDto userDto){
-
+    public ResponseEntity<JwtTokenResponse> authenticate(
+            @RequestBody @Valid SignInRequest signInRequest){
+        log.info("Get request for authenticate user: {}", signInRequest.login());
+        var token = authenticationService.authenticateUser(signInRequest);
+        return ResponseEntity.ok(new JwtTokenResponse(token));
     }
 }
