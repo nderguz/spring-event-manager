@@ -29,23 +29,19 @@ public class UserService {
         return universalUserMapper.entityToDomain(savedUser);
     }
 
-    public void registerNewUser(){
-
-    }
-
-    public void getUserInformation(){
-
-    }
-
-    public void userAuthentication(){
-
-    }
-
     public User getUserByLogin(String login) {
         return userRepository
                 .findByLogin(login)
                 .map(universalUserMapper::entityToDomain)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find user by login %s".formatted(login)));
+
+    }
+
+    public User findUserById(Long userId) {
+        return userRepository
+                .findById(userId)
+                .map(universalUserMapper::entityToDomain)
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find user by id %s".formatted(userId)));
 
     }
 }

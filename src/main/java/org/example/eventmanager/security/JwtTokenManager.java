@@ -60,4 +60,12 @@ public class JwtTokenManager {
                 .getSubject();
     }
 
+    public String getRoleFromToken(String jwtToken) {
+        return Jwts.parser()
+                .setSigningKey(signKey)
+                .build()
+                .parseClaimsJws(jwtToken)
+                .getBody()
+                .get("role", String.class);
+    }
 }

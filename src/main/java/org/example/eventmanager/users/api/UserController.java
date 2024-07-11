@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final UserService userService;
     private final UserRegistrationService userRegistrationService;
     private final UniversalUserMapper universalUserMapper;
     private final JwtTokenManager jwtTokenManager;
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<UserDto> registerUser(
@@ -40,8 +40,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public void getUserInfo(@PathVariable Long userId){
-
+    public ResponseEntity<UserDto> getUserInfo(
+            @PathVariable Long userId
+    ){
+        log.info("Request for retrieve user info for user: {}", userId);
+        var user = userService.findUserById(userId);
+        return ResponseEntity.ok(universalUserMapper.domainToDto(user));
     }
 
     @PostMapping("/auth")
