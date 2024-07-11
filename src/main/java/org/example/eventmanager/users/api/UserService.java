@@ -1,9 +1,9 @@
-package org.example.eventmanager.users;
+package org.example.eventmanager.users.api;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.users.entities.UniversalUserMapper;
-import org.example.eventmanager.users.entities.User;
+import org.example.eventmanager.users.db.UserRepository;
+import org.example.eventmanager.users.dto.UniversalUserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

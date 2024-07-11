@@ -1,9 +1,15 @@
-package org.example.eventmanager.users;
+package org.example.eventmanager.users.api;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.example.eventmanager.security.AuthenticationService;
 import org.example.eventmanager.security.JwtTokenManager;
-import org.example.eventmanager.users.entities.*;
+import org.example.eventmanager.security.entities.JwtTokenResponse;
+import org.example.eventmanager.security.UserRegistrationService;
+import org.example.eventmanager.security.entities.SignInRequest;
+import org.example.eventmanager.security.entities.SignUpRequest;
+import org.example.eventmanager.users.dto.UniversalUserMapper;
+import org.example.eventmanager.users.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

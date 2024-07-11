@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.entities;
+package org.example.eventmanager.security.entities;
 
 public record JwtTokenResponse (
         String jwtToken

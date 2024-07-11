@@ -1,9 +1,10 @@
-package org.example.eventmanager.users;
+package org.example.eventmanager.security;
 
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.users.entities.Roles;
-import org.example.eventmanager.users.entities.SignUpRequest;
-import org.example.eventmanager.users.entities.User;
+import org.example.eventmanager.security.entities.Roles;
+import org.example.eventmanager.users.api.UserService;
+import org.example.eventmanager.security.entities.SignUpRequest;
+import org.example.eventmanager.users.api.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

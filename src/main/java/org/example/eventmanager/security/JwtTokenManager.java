@@ -2,7 +2,7 @@ package org.example.eventmanager.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.example.eventmanager.users.entities.User;
+import org.example.eventmanager.users.api.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.spec.SecretKeySpec;

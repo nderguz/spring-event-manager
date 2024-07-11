@@ -1,8 +1,8 @@
-package org.example.eventmanager.users;
+package org.example.eventmanager.security;
 
 import lombok.AllArgsConstructor;
-import org.example.eventmanager.security.JwtTokenManager;
-import org.example.eventmanager.users.entities.SignInRequest;
+import org.example.eventmanager.users.api.UserService;
+import org.example.eventmanager.security.entities.SignInRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

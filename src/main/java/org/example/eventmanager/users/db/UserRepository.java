@@ -1,6 +1,5 @@
-package org.example.eventmanager.users;
+package org.example.eventmanager.users.db;
 
-import org.example.eventmanager.users.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

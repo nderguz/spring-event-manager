@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.entities;
+package org.example.eventmanager.users.db;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

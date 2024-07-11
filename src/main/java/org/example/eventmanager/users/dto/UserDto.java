@@ -1,4 +1,6 @@
-package org.example.eventmanager.users.entities;
+package org.example.eventmanager.users.dto;
+
+import org.example.eventmanager.security.entities.Roles;
 
 public record UserDto (
         Long id,

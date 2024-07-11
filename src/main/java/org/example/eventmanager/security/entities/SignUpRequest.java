@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.entities;
+package org.example.eventmanager.security.entities;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
