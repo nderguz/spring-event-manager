@@ -3,6 +3,7 @@ package org.example.eventmanager.security;
 import lombok.AllArgsConstructor;
 import org.example.eventmanager.errorhandler.CustomAccessDeniedHandler;
 import org.example.eventmanager.errorhandler.CustomAuthenticationEntryPoint;
+import org.example.eventmanager.security.jwt.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

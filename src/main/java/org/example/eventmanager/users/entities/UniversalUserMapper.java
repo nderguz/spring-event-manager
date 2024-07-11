@@ -1,8 +1,6 @@
-package org.example.eventmanager.users.dto;
+package org.example.eventmanager.users.entities;
 
 import org.example.eventmanager.security.entities.Roles;
-import org.example.eventmanager.users.api.User;
-import org.example.eventmanager.users.db.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component

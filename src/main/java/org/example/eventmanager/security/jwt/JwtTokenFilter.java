@@ -1,4 +1,4 @@
-package org.example.eventmanager.security;
+package org.example.eventmanager.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

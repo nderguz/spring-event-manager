@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.api;
+package org.example.eventmanager.users.entities;
 
 import org.example.eventmanager.security.entities.Roles;
 
