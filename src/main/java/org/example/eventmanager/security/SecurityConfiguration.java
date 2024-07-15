@@ -43,7 +43,8 @@ public class SecurityConfiguration {
                   "/configuration/security",
                   "/swagger-ui.html",
                   "/webjars/**",
-                  "/v3/api-docs/swagger-config"
+                  "/v3/api-docs/swagger-config",
+                  "/event-manager-openapi.yaml"
                 );
     }
 
@@ -67,6 +68,7 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/users").permitAll()
                             .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/events").hasAuthority("USER")
                             .anyRequest().authenticated();
                         }
                 )
