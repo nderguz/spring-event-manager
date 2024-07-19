@@ -12,6 +12,6 @@ public record EventDto(
         String name,
         Long id,
         Long ownerId,
-        String status
+        EventStatus status
 ) {
 }

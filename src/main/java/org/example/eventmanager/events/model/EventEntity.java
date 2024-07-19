@@ -1,8 +1,11 @@
 package org.example.eventmanager.events.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 @Entity
@@ -41,6 +44,7 @@ public class EventEntity {
     private Integer duration;
 
     @Column(name = "date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date date;
 
     @Column(name = "reserved_places")

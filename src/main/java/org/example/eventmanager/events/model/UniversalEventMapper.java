@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UniversalEventMapper {
+
     public EventDomain requestToDomain(User user, RequestEvent requestEvent, Location location){
         return new EventDomain(
-                null,
+                1,
                 requestEvent.date(),
                 requestEvent.duration(),
                 requestEvent.cost(),
@@ -17,7 +18,7 @@ public class UniversalEventMapper {
                 requestEvent.name(),
                 null,
                 user.id(),
-                "WAIT"
+                EventStatus.WAITING
         );
     }
 
@@ -26,7 +27,7 @@ public class UniversalEventMapper {
                 domain.id(),
                 domain.locationId(),
                 domain.name(),
-                domain.status(),
+                domain.status().toString(),
                 domain.ownerId(),
                 domain.maxPlaces(),
                 domain.cost(),
@@ -62,7 +63,7 @@ public class UniversalEventMapper {
                 entity.getName(),
                 entity.getId(),
                 entity.getOwnerId(),
-                entity.getStatus()
+                EventStatus.valueOf(entity.getStatus())
         );
     }
 }

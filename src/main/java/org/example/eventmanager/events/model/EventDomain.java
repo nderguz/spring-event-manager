@@ -12,6 +12,6 @@ public record EventDomain (
         String name,
         Long id,
         Long ownerId,
-        String status
+        EventStatus status
 ){
 }

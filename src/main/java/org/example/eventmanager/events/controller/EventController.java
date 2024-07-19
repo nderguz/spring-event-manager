@@ -31,4 +31,16 @@ public class EventController {
         return ResponseEntity.status(201).body(universalEventMapper.domainToDto(createdEvent));
     }
 
+    @DeleteMapping
+    public void deleteEvent(){
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventDto> getEventById(
+            @PathVariable Long eventId
+    ){
+        var foundLocation = eventService.getEventById(eventId);
+        return ResponseEntity.ok(universalEventMapper.domainToDto(foundLocation));
+    }
+
 }

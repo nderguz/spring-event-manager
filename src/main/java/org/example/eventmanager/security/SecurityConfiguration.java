@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.Clock;
+
 @Configuration
 @AllArgsConstructor
 public class SecurityConfiguration {
@@ -69,6 +71,7 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.POST, "/users").permitAll()
                             .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
                             .requestMatchers(HttpMethod.POST, "/events").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
                             .anyRequest().authenticated();
                         }
                 )

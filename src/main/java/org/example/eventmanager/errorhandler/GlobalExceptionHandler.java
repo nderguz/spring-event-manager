@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.text.ParseException;
 import java.time.LocalDateTime;
 
 
@@ -69,5 +71,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(401).body(message);
+    }
+
+    @ExceptionHandler(value = ParseException.class)
+    public ResponseEntity<ServerMessageHelper> handleParseException(final ParseException ex) {
+        log.error("Handle parse exception", ex);
+        var message = new ServerMessageHelper(
+                "Ошибка парсинга данных",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 }
