@@ -72,6 +72,7 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
                             .requestMatchers(HttpMethod.POST, "/events").permitAll()
                             .requestMatchers(HttpMethod.GET, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.DELETE, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
                             .anyRequest().authenticated();
                         }
                 )

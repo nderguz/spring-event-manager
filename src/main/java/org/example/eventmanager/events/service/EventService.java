@@ -7,7 +7,9 @@ import org.example.eventmanager.events.model.*;
 import org.example.eventmanager.events.repository.EventRepository;
 import org.example.eventmanager.events.repository.RegistrationRepository;
 import org.example.eventmanager.location.LocationService;
+import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.services.UserService;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +40,33 @@ public class EventService {
     public EventDomain getEventById(Long eventId){
         //todo проверка на закрытость события
         return universalEventMapper.entityToDomain(eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId))));
+    }
+
+    public EventDomain deleteEvent(Long eventId, String userRole, String userLogin) {
+        var userInfo = userService.getUserByLogin(userLogin);
+        var eventToDelete = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+
+        //todo роль и id совпадает, но не пускает дальше
+
+        if(!userRole.equals(Roles.ADMIN.toString())  || userInfo.id().equals(eventToDelete.getOwnerId())){
+            log.info("Roles equals: {}", userRole.equals(Roles.ADMIN.toString()));
+            log.info("Ids equals: {}", userInfo.id().equals(eventToDelete.getOwnerId()));
+            log.info("User role {}", userRole);
+            log.info("User role {}", Roles.USER);
+            log.info("User id {}", eventToDelete.getOwnerId());
+            log.info("User id {}", userInfo.id());
+            throw new BadCredentialsException("Данный пользователь не может удалить событие");
+        }
+
+        if (eventToDelete.getStatus().equals(EventStatus.STARTED.toString())){
+            throw new IllegalArgumentException("Event is already started");
+        }
+        if (eventToDelete.getStatus().equals(EventStatus.FINISHED.toString())){
+            throw new IllegalArgumentException("Cannot close finished events");
+        }
+        eventToDelete.setStatus(EventStatus.CANCELLED.toString());
+        eventRepository.save(eventToDelete);
+        return universalEventMapper.entityToDomain(eventToDelete);
     }
 
 }

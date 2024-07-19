@@ -1,6 +1,7 @@
 package org.example.eventmanager.errorhandler;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,9 +15,8 @@ import java.time.LocalDateTime;
 
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
-    private final static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<ServerMessageHelper> handleMethodArgumentNotValidException(final IllegalArgumentException ex) {

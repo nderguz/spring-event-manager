@@ -20,19 +20,31 @@ public class EventController {
     private final JwtTokenManager jwtTokenManager;
     private final UniversalEventMapper universalEventMapper;
 
+    //todo вынести проверку пользователя в отдельный метод
+
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
             @RequestBody RequestEvent eventToCreate,
             @RequestHeader("Authorization") String token
     ){
+        log.info("Creating event: {}", eventToCreate);
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         var createdEvent = eventService.createEvent(eventToCreate, userLogin);
         return ResponseEntity.status(201).body(universalEventMapper.domainToDto(createdEvent));
     }
 
-    @DeleteMapping
-    public void deleteEvent(){
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<EventDto> deleteEvent(
+            @PathVariable Long eventId,
+            @RequestHeader("Authorization") String token
+    ){
+        log.info("Deleting event: {}", eventId);
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        var userRole = jwtTokenManager.getRoleFromToken(validToken);
+        var eventToDelete = eventService.deleteEvent(eventId, userRole, userLogin);
+        return ResponseEntity.status(204).body(universalEventMapper.domainToDto(eventToDelete));
     }
 
     @GetMapping("/{eventId}")
