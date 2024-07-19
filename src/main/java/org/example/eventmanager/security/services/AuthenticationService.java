@@ -22,7 +22,7 @@ public class AuthenticationService {
 
         var user = userService.getUserByLogin(signInRequest.login());
 
-        if(!passwordEncoder.matches(signInRequest.password(), user.passwordHash())){
+        if(!passwordEncoder.matches(signInRequest.password(), user.getPasswordHash())){
            throw new BadCredentialsException("Введен некорректный пароль");
         }
 

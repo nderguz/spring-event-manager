@@ -17,7 +17,7 @@ public class UniversalEventMapper {
                 location.Id(),
                 requestEvent.name(),
                 null,
-                user.id(),
+                user.getId(),
                 EventStatus.WAITING
         );
     }

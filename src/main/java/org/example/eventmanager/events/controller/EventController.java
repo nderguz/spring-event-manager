@@ -55,4 +55,17 @@ public class EventController {
         return ResponseEntity.ok(universalEventMapper.domainToDto(foundLocation));
     }
 
+    @PutMapping("/{eventId}")
+    public ResponseEntity<EventDto> updateEvent(
+            @PathVariable Long eventId,
+            @RequestBody RequestEvent eventToUpdate,
+            @RequestHeader("Authorization") String token
+    ){
+        log.info("Updating event: {}", eventId);
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        var updatedLocation = eventService.updateEvent(eventId, userLogin, eventToUpdate);
+        return ResponseEntity.ok(universalEventMapper.domainToDto(updatedLocation));
+    }
+
 }

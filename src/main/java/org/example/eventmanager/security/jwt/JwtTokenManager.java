@@ -27,12 +27,12 @@ public class JwtTokenManager {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.role().name());
+        claims.put("role", user.getRole().name());
         Date issuedTime = new Date();
         Date expirationTime = new Date(issuedTime.getTime() + tokenLifeTime);
         return Jwts.builder()
                 .claims(claims)
-                .subject(user.login())
+                .subject(user.getLogin())
                 .issuedAt(issuedTime)
                 .expiration(expirationTime)
                 .signWith(signKey)
