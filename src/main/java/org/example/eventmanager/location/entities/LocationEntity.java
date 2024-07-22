@@ -1,5 +1,5 @@
 package org.example.eventmanager.location.entities;
-//Сущность для БД
+
 import jakarta.persistence.*;
 import lombok.*;
 

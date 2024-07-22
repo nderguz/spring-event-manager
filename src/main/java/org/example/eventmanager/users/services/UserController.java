@@ -2,6 +2,7 @@ package org.example.eventmanager.users.services;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
 import org.example.eventmanager.security.entities.JwtTokenResponse;
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserRegistrationService userRegistrationService;
     private final UniversalUserMapper universalUserMapper;
     private final JwtTokenManager jwtTokenManager;

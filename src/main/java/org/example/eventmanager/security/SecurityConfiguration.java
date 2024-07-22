@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.Clock;
+
 @Configuration
 @AllArgsConstructor
 public class SecurityConfiguration {
@@ -43,7 +45,8 @@ public class SecurityConfiguration {
                   "/configuration/security",
                   "/swagger-ui.html",
                   "/webjars/**",
-                  "/v3/api-docs/swagger-config"
+                  "/v3/api-docs/swagger-config",
+                  "/event-manager-openapi.yaml"
                 );
     }
 
@@ -67,6 +70,10 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/users").permitAll()
                             .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/events").hasAuthority("USER")
+                            .requestMatchers(HttpMethod.GET, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.DELETE, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/events/my").hasAuthority("USER")
                             .anyRequest().authenticated();
                         }
                 )

@@ -2,6 +2,7 @@ package org.example.eventmanager.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.users.entities.UserRepository;
 import org.example.eventmanager.users.entities.UniversalUserMapper;
 import org.example.eventmanager.users.entities.User;
@@ -11,12 +12,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
     private final UniversalUserMapper universalUserMapper;
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
 
     public boolean isUserExistsByLogin(String login){
         return userRepository.findByLogin(login)

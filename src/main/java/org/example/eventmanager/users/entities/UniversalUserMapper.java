@@ -7,20 +7,20 @@ import org.springframework.stereotype.Component;
 public class UniversalUserMapper {
     public UserDto domainToDto(User userDomain){
         return new UserDto(
-                userDomain.id(),
-                userDomain.login(),
-                userDomain.age(),
-                userDomain.role()
+                userDomain.getId(),
+                userDomain.getLogin(),
+                userDomain.getAge(),
+                userDomain.getRole()
         );
     }
 
     public UserEntity domainToEntity(User userDomain){
         return new UserEntity(
-                userDomain.id(),
-                userDomain.login(),
-                userDomain.passwordHash(),
-                userDomain.age(),
-                userDomain.role().name()
+                userDomain.getId(),
+                userDomain.getLogin(),
+                userDomain.getPasswordHash(),
+                userDomain.getAge(),
+                userDomain.getRole().name()
         );
     }
 

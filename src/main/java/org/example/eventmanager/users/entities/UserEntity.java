@@ -13,6 +13,9 @@ import lombok.Setter;
 @Setter
 @Table(name = "users")
 public class UserEntity {
+
+    //todo запилить отношения
+
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

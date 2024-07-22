@@ -1,6 +1,7 @@
 package org.example.eventmanager.errorhandler;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -8,15 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
-    private final static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<ServerMessageHelper> handleMethodArgumentNotValidException(final IllegalArgumentException ex) {
@@ -71,5 +71,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(401).body(message);
+    }
+
+    @ExceptionHandler(value = ParseException.class)
+    public ResponseEntity<ServerMessageHelper> handleParseException(final ParseException ex) {
+        log.error("Handle parse exception", ex);
+        var message = new ServerMessageHelper(
+                "Ошибка парсинга данных",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 }
