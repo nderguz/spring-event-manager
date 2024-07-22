@@ -4,9 +4,10 @@ import org.example.eventmanager.events.model.EventStatus;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 public record EventDomain (
-        Integer occupiedPlaces,
+        List<Registration> occupiedPlaces,
         LocalDateTime date,
         Integer duration,
         Integer cost,

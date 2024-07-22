@@ -5,11 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.UniversalEventMapper;
 import org.example.eventmanager.events.model.event.EventSearchFilter;
-import org.example.eventmanager.events.model.registration.RegistrationDomain;
 import org.example.eventmanager.events.service.EventService;
 import org.example.eventmanager.events.model.event.EventDto;
 import org.example.eventmanager.events.model.RequestEvent;
-import org.example.eventmanager.security.jwt.JwtTokenManager;
+import org.example.eventmanager.security.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,33 +22,24 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
-    private final JwtTokenManager jwtTokenManager;
     private final UniversalEventMapper universalEventMapper;
 
     //todo вынести проверку пользователя в отдельный метод
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
-            @RequestBody RequestEvent eventToCreate,
-            @RequestHeader("Authorization") String token
+            @RequestBody RequestEvent eventToCreate
     ) {
-        log.info("Creating event: {}", eventToCreate);
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        var createdEvent = eventService.createEvent(eventToCreate, userLogin);
+        var createdEvent = eventService.createEvent(eventToCreate);
         return ResponseEntity.status(201).body(universalEventMapper.domainToDto(createdEvent));
     }
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<EventDto> deleteEvent(
-            @PathVariable Long eventId,
-            @RequestHeader("Authorization") String token
+            @PathVariable Long eventId
     ) {
-        log.info("Deleting event: {}", eventId);
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        var userRole = jwtTokenManager.getRoleFromToken(validToken);
-        var eventToDelete = eventService.deleteEvent(eventId, userRole, userLogin);
+
+        var eventToDelete = eventService.deleteEvent(eventId);
         return ResponseEntity.status(204).body(universalEventMapper.domainToDto(eventToDelete));
     }
 
@@ -64,13 +54,9 @@ public class EventController {
     @PutMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable Long eventId,
-            @RequestBody RequestEvent eventToUpdate,
-            @RequestHeader("Authorization") String token
+            @RequestBody RequestEvent eventToUpdate
     ) {
-        log.info("Updating event: {}", eventId);
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        var updatedLocation = eventService.updateEvent(eventId, userLogin, eventToUpdate);
+        var updatedLocation = eventService.updateEvent(eventId, eventToUpdate);
         return ResponseEntity.ok(universalEventMapper.domainToDto(updatedLocation));
     }
 
@@ -89,43 +75,30 @@ public class EventController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<EventDto>> getMyEvents(
-            @RequestHeader("Authorization") String token
-    ) {
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        var userEvents = eventService.getUserEvents(userLogin).stream().map(universalEventMapper::domainToDto).toList();
+    public ResponseEntity<List<EventDto>> getMyEvents() {
+        var userEvents = eventService.getUserEvents().stream().map(universalEventMapper::domainToDto).toList();
         return ResponseEntity.ok().body(userEvents);
     }
 
     @PostMapping("/registrations/{eventId}")
     public void registerToEvent(
-            @PathVariable Long eventId,
-            @RequestHeader("Authorization") String token
+            @PathVariable Long eventId
     ) {
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        eventService.registerUserToEvent(userLogin, eventId);
+        eventService.registerUserToEvent(eventId);
     }
 
     @DeleteMapping("/registrations/cancel/{eventId}")
     public ResponseEntity<?> cancelRegistration(
-            @PathVariable Long eventId,
-            @RequestHeader("Authorization") String token
+            @PathVariable Long eventId
     ) {
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        eventService.cancelRegistration(userLogin, eventId);
+        eventService.cancelRegistration(eventId);
         return ResponseEntity.status(204).body(null);
     }
 
     @GetMapping("/registrations/my")
     public ResponseEntity<List<EventDto>> getMyRegistrations(
-            @RequestHeader("Authorization") String token
     ) {
-        var validToken = token.substring(7);
-        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
-        var events = eventService.getUserRegistrations(userLogin);
+        var events = eventService.getUserRegistrations();
         return ResponseEntity.ok().body(events.stream()
                 .map(universalEventMapper::domainToDto)
                 .toList());

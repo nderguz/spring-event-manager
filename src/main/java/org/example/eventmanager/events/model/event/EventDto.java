@@ -4,6 +4,7 @@ import org.example.eventmanager.events.model.EventStatus;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 public record EventDto(
         Integer occupiedPlaces,

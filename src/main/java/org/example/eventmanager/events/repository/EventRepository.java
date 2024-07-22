@@ -19,11 +19,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
     List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
 
-    @Query("SELECT e FROM EventEntity e WHERE e.id IN :eventIds")
-    List<EventEntity> findEventsByIds(
-           @Param("eventIds") List<Long> eventIds
-    );
-
     @Query("""
             SELECT e FROM EventEntity e 
             WHERE (:name IS NULL OR e.name LIKE %:name%) 
