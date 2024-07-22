@@ -1,13 +1,16 @@
 package org.example.eventmanager.events.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.UniversalEventMapper;
+import org.example.eventmanager.events.model.event.EventSearchFilter;
 import org.example.eventmanager.events.model.registration.RegistrationDomain;
 import org.example.eventmanager.events.service.EventService;
 import org.example.eventmanager.events.model.event.EventDto;
 import org.example.eventmanager.events.model.RequestEvent;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +32,7 @@ public class EventController {
     public ResponseEntity<EventDto> createEvent(
             @RequestBody RequestEvent eventToCreate,
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         log.info("Creating event: {}", eventToCreate);
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
@@ -41,7 +44,7 @@ public class EventController {
     public ResponseEntity<EventDto> deleteEvent(
             @PathVariable Long eventId,
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         log.info("Deleting event: {}", eventId);
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
@@ -53,7 +56,7 @@ public class EventController {
     @GetMapping("/{eventId}")
     public ResponseEntity<EventDto> getEventById(
             @PathVariable Long eventId
-    ){
+    ) {
         var foundLocation = eventService.getEventById(eventId);
         return ResponseEntity.ok(universalEventMapper.domainToDto(foundLocation));
     }
@@ -63,7 +66,7 @@ public class EventController {
             @PathVariable Long eventId,
             @RequestBody RequestEvent eventToUpdate,
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         log.info("Updating event: {}", eventId);
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
@@ -72,14 +75,23 @@ public class EventController {
     }
 
     @PostMapping("/search")
-    public void searchEvents(){
-
+    public ResponseEntity<List<EventDto>> searchEvents(
+            @RequestBody @Valid EventSearchFilter searchFilter
+    ) {
+        log.info("Get request for search events: filter={}", searchFilter);
+        var foundEvents = eventService.searchByFilter(searchFilter);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(foundEvents.stream()
+                        .map(universalEventMapper::domainToDto)
+                        .toList()
+                );
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getMyEvents(
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         var userEvents = eventService.getUserEvents(userLogin).stream().map(universalEventMapper::domainToDto).toList();
@@ -90,7 +102,7 @@ public class EventController {
     public void registerToEvent(
             @PathVariable Long eventId,
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         eventService.registerUserToEvent(userLogin, eventId);
@@ -100,7 +112,7 @@ public class EventController {
     public ResponseEntity<?> cancelRegistration(
             @PathVariable Long eventId,
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         eventService.cancelRegistration(userLogin, eventId);
@@ -110,7 +122,7 @@ public class EventController {
     @GetMapping("/registrations/my")
     public ResponseEntity<List<EventDto>> getMyRegistrations(
             @RequestHeader("Authorization") String token
-    ){
+    ) {
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         var events = eventService.getUserRegistrations(userLogin);

@@ -6,10 +6,10 @@ import org.example.eventmanager.events.model.event.EventEntity;
 import org.example.eventmanager.events.model.EventStatus;
 import org.example.eventmanager.events.repository.EventRepository;
 import org.springframework.stereotype.Service;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,29 +19,26 @@ import java.util.Objects;
 public class EventSсheduler implements EventSchedulerService {
 
     private final EventRepository eventRepository;
+//todo перепроверить шедулер
 
     @Override
     public void scheduleCheckEventStatus(EventStatus eventStatus) throws ParseException {
-        Instant dateTime = Instant.now();
-        List<EventEntity> events = eventRepository.findAllByStatus(eventStatus.toString());
+        LocalDateTime dateTime = LocalDateTime.now();
+        List<EventEntity> events = eventRepository.findAllByStatus(eventStatus);
         for (EventEntity event : events) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Instant eventDate = formatter.parse(event.getDate().toString()).toInstant();
+            var date = event.getDate();
 
-
-            if (Objects.equals(event.getStatus(), EventStatus.WAITING.toString())) {
-                if (dateTime.isAfter(eventDate)) {
-                    event.setStatus(EventStatus.STARTED.toString());
+            if (Objects.equals(event.getStatus(), EventStatus.WAITING)) {
+                if (dateTime.isAfter(date)) {
+                    event.setStatus(EventStatus.STARTED);
                     eventRepository.save(event);
                 }
             }
-            else if (Objects.equals(event.getStatus(), EventStatus.STARTED.toString())) {
-                var duration = event.getDuration() * 60000L;
-                Instant eventEndDate = eventDate.plusMillis(duration);
+            else if (Objects.equals(event.getStatus(), EventStatus.STARTED)) {
+                LocalDateTime eventEndDate = date.plusMinutes(event.getDuration());
                 if (dateTime.isAfter(eventEndDate)) {
-                    event.setStatus(EventStatus.FINISHED.toString());
+                    event.setStatus(EventStatus.FINISHED);
                     eventRepository.save(event);
-
                 }
             }
 

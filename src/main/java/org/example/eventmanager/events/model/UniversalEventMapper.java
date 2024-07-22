@@ -32,7 +32,7 @@ public class UniversalEventMapper {
                 domain.id(),
                 domain.locationId(),
                 domain.name(),
-                domain.status().toString(),
+                domain.status(),
                 domain.ownerId(),
                 domain.maxPlaces(),
                 domain.cost(),
@@ -68,7 +68,7 @@ public class UniversalEventMapper {
                 entity.getName(),
                 entity.getId(),
                 entity.getOwnerId(),
-                EventStatus.valueOf(entity.getStatus())
+                entity.getStatus()
         );
     }
 

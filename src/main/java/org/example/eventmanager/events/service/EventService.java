@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.*;
 import org.example.eventmanager.events.model.event.EventDomain;
-import org.example.eventmanager.events.model.event.EventEntity;
-import org.example.eventmanager.events.model.registration.RegistrationDomain;
+import org.example.eventmanager.events.model.event.EventSearchFilter;
 import org.example.eventmanager.events.model.registration.RegistrationEntity;
 import org.example.eventmanager.events.repository.EventRepository;
 import org.example.eventmanager.events.repository.RegistrationRepository;
@@ -15,11 +14,8 @@ import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.services.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -41,7 +37,7 @@ public class EventService {
         var locationInfo = locationService.getLocationById(eventToCreate.locationId());
         var eventToSave = universalEventMapper.requestToDomain(userInfo, eventToCreate, locationInfo);
         var savedEvent = eventRepository.save(universalEventMapper.domainToEntity(eventToSave));
-        var registration = new RegistrationEntity(null, savedEvent.getId(), userInfo.getId(), RegistrationStatus.OPENED.name());
+        var registration = new RegistrationEntity(null, savedEvent.getId(), userInfo.getId(), RegistrationStatus.OPENED);
         registrationRepository.save(registration);
         return universalEventMapper.entityToDomain(savedEvent);
     }
@@ -66,7 +62,7 @@ public class EventService {
             if (eventToDelete.getStatus().equals(EventStatus.FINISHED.toString())) {
                 throw new IllegalArgumentException("Cannot close finished events");
             }
-            eventToDelete.setStatus(EventStatus.CANCELLED.toString());
+            eventToDelete.setStatus(EventStatus.CANCELLED);
             eventRepository.save(eventToDelete);
             return universalEventMapper.entityToDomain(eventToDelete);
         } else {
@@ -118,7 +114,7 @@ public class EventService {
             throw new IllegalArgumentException("User already registered at this event");
         }
 
-        var registration = new RegistrationEntity(null, event.getId(), user.getId(), RegistrationStatus.OPENED.name());
+        var registration = new RegistrationEntity(null, event.getId(), user.getId(), RegistrationStatus.OPENED);
         registrationRepository.save(registration);
     }
 
@@ -126,11 +122,11 @@ public class EventService {
     public void cancelRegistration(String userLogin, Long eventId) {
         var user = userService.getUserByLogin(userLogin);
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        if (event.getStatus().equals(EventStatus.STARTED.name()) || event.getStatus().equals(EventStatus.FINISHED.name())) {
+        if (event.getStatus().equals(EventStatus.STARTED) || event.getStatus().equals(EventStatus.FINISHED)) {
             throw new IllegalArgumentException("Cannot cancel registration at started or finished event");
         }
         var registration = registrationRepository.findUserRegistration(user.getId(), event.getId());
-        registration.setRegistrationStatus(RegistrationStatus.CLOSED.name());
+        registration.setRegistrationStatus(RegistrationStatus.CLOSED);
         registrationRepository.save(registration);
     }
 
@@ -141,6 +137,25 @@ public class EventService {
                 .map(RegistrationEntity::getEventId)
                 .toList();
         return eventRepository.findEventsByIds(eventIds).stream()
+                .map(universalEventMapper::entityToDomain)
+                .toList();
+    }
+
+    public List<EventDomain> searchByFilter(EventSearchFilter searchFilter) {
+        var foundEntities = eventRepository.findEvents(
+                searchFilter.name(),
+                searchFilter.placesMin(),
+                searchFilter.placesMax(),
+                searchFilter.dateStartAfter(),
+                searchFilter.dateStartBefore(),
+                searchFilter.costMin(),
+                searchFilter.costMax(),
+                searchFilter.durationMin(),
+                searchFilter.durationMax(),
+                searchFilter.locationId(),
+                searchFilter.eventStatus()
+        );
+        return foundEntities.stream()
                 .map(universalEventMapper::entityToDomain)
                 .toList();
     }

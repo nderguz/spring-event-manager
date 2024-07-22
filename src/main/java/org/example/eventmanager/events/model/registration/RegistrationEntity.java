@@ -2,6 +2,7 @@ package org.example.eventmanager.events.model.registration;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.eventmanager.events.model.RegistrationStatus;
 
 @Entity
 @Data
@@ -14,6 +15,11 @@ import lombok.*;
 public class RegistrationEntity {
 
     //todo запилить отношения
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "event_id")
+//    private EventEntity event;
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,5 +32,5 @@ public class RegistrationEntity {
     private Long userId;
 
     @Column(name = "status")
-    private String registrationStatus;
+    private RegistrationStatus registrationStatus;
 }

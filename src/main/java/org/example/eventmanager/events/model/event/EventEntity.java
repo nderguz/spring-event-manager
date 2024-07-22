@@ -3,9 +3,9 @@ package org.example.eventmanager.events.model.event;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.example.eventmanager.events.model.EventStatus;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -19,6 +19,10 @@ public class EventEntity {
 
     //todo запилить отношения
 
+//
+//    @OneToMany(mappedBy = "event")
+//    private List<EventRegistrationEntity> registrationList;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
@@ -31,7 +35,7 @@ public class EventEntity {
     private String name;
 
     @Column(name = "status")
-    private String status;
+    private EventStatus status;
 
     @Column(name = "user_id")
     private Long ownerId;
@@ -46,8 +50,7 @@ public class EventEntity {
     private Integer duration;
 
     @Column(name = "date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date date;
+    private LocalDateTime date;
 
     @Column(name = "reserved_places")
     private Integer occupiedPlaces;

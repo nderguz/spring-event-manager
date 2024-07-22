@@ -2,11 +2,12 @@ package org.example.eventmanager.events.model.event;
 
 import org.example.eventmanager.events.model.EventStatus;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public record EventDomain (
         Integer occupiedPlaces,
-        Date date,
+        LocalDateTime date,
         Integer duration,
         Integer cost,
         Integer maxPlaces,
