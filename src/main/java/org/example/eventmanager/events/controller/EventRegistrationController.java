@@ -16,14 +16,14 @@ public class EventRegistrationController {
     private final UniversalEventMapper universalEventMapper;
     private final EventRegistrationService eventRegistrationService;
 
-    @PostMapping("/registrations/{eventId}")
+    @PostMapping("/{eventId}")
     public void registerToEvent(
             @PathVariable Long eventId
     ) {
         eventRegistrationService.registerUserToEvent(eventId);
     }
 
-    @DeleteMapping("/registrations/cancel/{eventId}")
+    @DeleteMapping("/cancel/{eventId}")
     public ResponseEntity<?> cancelRegistration(
             @PathVariable Long eventId
     ) {
@@ -31,12 +31,17 @@ public class EventRegistrationController {
         return ResponseEntity.status(204).body(null);
     }
 
-    @GetMapping("/registrations/my")
+    @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getMyRegistrations(
     ) {
         var events = eventRegistrationService.getUserRegistrations();
         return ResponseEntity.ok().body(events.stream()
                 .map(universalEventMapper::domainToDto)
                 .toList());
+    }
+
+    @GetMapping("/debug-event-count")
+    public void testRequest(){
+        eventRegistrationService.checkCapacityOfEvent(1L);
     }
 }

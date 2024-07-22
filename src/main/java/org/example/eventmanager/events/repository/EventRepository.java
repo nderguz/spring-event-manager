@@ -2,6 +2,7 @@ package org.example.eventmanager.events.repository;
 
 import org.example.eventmanager.events.model.EventStatus;
 import org.example.eventmanager.events.model.event.EventEntity;
+import org.example.eventmanager.events.model.registration.RegistrationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +19,11 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
     List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
+
+    @Query("SELECT e.registrations FROM EventEntity e JOIN e.registrations r WHERE e.id = :eventId AND r.registrationStatus = 0")
+    List <RegistrationEntity> getEventOpenedRegistrations(
+            @Param("eventId") Long eventId
+    );
 
     @Query("""
             SELECT e FROM EventEntity e 

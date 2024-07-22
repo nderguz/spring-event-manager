@@ -2,6 +2,7 @@ package org.example.eventmanager.events.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.EventStatus;
 import org.example.eventmanager.events.model.RegistrationStatus;
 import org.example.eventmanager.events.model.UniversalEventMapper;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EventRegistrationService {
 
     private final AuthenticationService authenticationService;
@@ -25,10 +27,11 @@ public class EventRegistrationService {
 
 
     @Transactional
-    public void registerUserToEvent(Long eventId) throws NullPointerException {
+    public void registerUserToEvent(Long eventId) {
         //todo проверка на заполненность мероприятий
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        checkCapacityOfEvent(event.getId());
         if(event.getOwnerId().equals(currentUser.getId())){
             throw new IllegalArgumentException("Owner cannot register to the event");
         }
@@ -68,5 +71,13 @@ public class EventRegistrationService {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var foundEvents = registrationRepository.findUserEvents(currentUser.getId());
         return foundEvents.stream().map(universalEventMapper::entityToDomain).toList();
+    }
+
+    public void checkCapacityOfEvent(Long eventId){
+        var registrations = eventRepository.getEventOpenedRegistrations(eventId);
+        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        if (registrations.size() + 1 > event.getMaxPlaces() ){
+            throw new IllegalArgumentException("The allowed guest limit for the event has been exceeded");
+        }
     }
 }
