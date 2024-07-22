@@ -3,8 +3,8 @@ package org.example.eventmanager.users;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.example.eventmanager.security.entities.Roles;
-import org.example.eventmanager.users.entities.User;
-import org.example.eventmanager.users.services.UserService;
+import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 

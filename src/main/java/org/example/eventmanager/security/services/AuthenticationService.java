@@ -1,10 +1,9 @@
 package org.example.eventmanager.security.services;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
-import org.example.eventmanager.users.entities.User;
-import org.example.eventmanager.users.services.UserService;
+import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.UserService;
 import org.example.eventmanager.security.entities.SignInRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;

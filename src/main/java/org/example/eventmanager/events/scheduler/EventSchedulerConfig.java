@@ -2,7 +2,7 @@ package org.example.eventmanager.events.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.eventmanager.events.model.EventStatus;
+import org.example.eventmanager.events.domain.EventStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

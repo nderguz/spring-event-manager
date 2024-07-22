@@ -1,6 +1,6 @@
 package org.example.eventmanager.events.scheduler;
 
-import org.example.eventmanager.events.model.EventStatus;
+import org.example.eventmanager.events.domain.EventStatus;
 
 import java.text.ParseException;
 
