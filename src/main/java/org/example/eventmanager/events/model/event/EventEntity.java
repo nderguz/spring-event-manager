@@ -50,19 +50,4 @@ public class EventEntity {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RegistrationEntity> registrations;
 
-    @Override
-    public String toString() {
-        return "EventEntity{" +
-                "id=" + id +
-                ", locationId=" + locationId +
-                ", name='" + name + '\'' +
-                ", status=" + status +
-                ", ownerId=" + ownerId +
-                ", maxPlaces=" + maxPlaces +
-                ", cost=" + cost +
-                ", duration=" + duration +
-                ", date=" + date +
-                ", registrations=" + registrations +
-                '}';
-    }
 }
