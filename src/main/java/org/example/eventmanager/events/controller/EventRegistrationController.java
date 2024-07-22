@@ -40,8 +40,4 @@ public class EventRegistrationController {
                 .toList());
     }
 
-    @GetMapping("/debug-event-count")
-    public void testRequest(){
-        eventRegistrationService.checkCapacityOfEvent(1L);
-    }
 }

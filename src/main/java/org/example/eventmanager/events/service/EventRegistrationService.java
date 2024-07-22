@@ -73,7 +73,7 @@ public class EventRegistrationService {
         return foundEvents.stream().map(universalEventMapper::entityToDomain).toList();
     }
 
-    public void checkCapacityOfEvent(Long eventId){
+    private void checkCapacityOfEvent(Long eventId){
         var registrations = eventRepository.getEventOpenedRegistrations(eventId);
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         if (registrations.size() + 1 > event.getMaxPlaces() ){
