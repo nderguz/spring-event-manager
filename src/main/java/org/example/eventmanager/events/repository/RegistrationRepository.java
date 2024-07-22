@@ -2,6 +2,7 @@ package org.example.eventmanager.events.repository;
 
 import org.example.eventmanager.events.model.event.EventEntity;
 import org.example.eventmanager.events.model.registration.RegistrationEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public interface RegistrationRepository extends CrudRepository<RegistrationEntity, Long> {
 
     @Query("SELECT r FROM RegistrationEntity r WHERE r.userId = :user_id and r.event.id = :event_id")
-    Optional<RegistrationEntity> findUserRegistration (
+    Optional<RegistrationEntity> findUserRegistration(
             @Param("user_id") Long userId,
             @Param("event_id") Long eventId
     );
@@ -23,6 +24,7 @@ public interface RegistrationRepository extends CrudRepository<RegistrationEntit
             @Param("user_id") Long userId
     );
 
+    @Modifying
     @Query("UPDATE RegistrationEntity SET registrationStatus = 1 WHERE userId = :user_id AND event = :event")
     void closeRegistration(
             @Param("user_id") Long userId,

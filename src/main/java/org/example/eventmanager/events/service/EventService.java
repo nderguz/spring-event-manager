@@ -7,13 +7,10 @@ import org.example.eventmanager.events.model.*;
 import org.example.eventmanager.events.model.event.EventDomain;
 import org.example.eventmanager.events.model.event.EventEntity;
 import org.example.eventmanager.events.model.event.EventSearchFilter;
-import org.example.eventmanager.events.model.registration.RegistrationEntity;
 import org.example.eventmanager.events.repository.EventRepository;
-import org.example.eventmanager.events.repository.RegistrationRepository;
 import org.example.eventmanager.location.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
-import org.example.eventmanager.users.entities.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -26,7 +23,6 @@ public class EventService {
     private final LocationService locationService;
     private final EventRepository eventRepository;
     private final UniversalEventMapper universalEventMapper;
-    private final RegistrationRepository registrationRepository;
     private final AuthenticationService authenticationService;
 
     //todo переделать статус регистрации
@@ -116,52 +112,6 @@ public class EventService {
     }
 
     @Transactional
-    public void registerUserToEvent(Long eventId) throws NullPointerException {
-        //todo проверка на заполненность мероприятий
-        var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        if(event.getOwnerId().equals(currentUser.getId())){
-            throw new IllegalArgumentException("Owner cannot register to the event");
-        }
-        if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.CANCELLED) || event.getStatus().equals(EventStatus.STARTED)) {
-            throw new IllegalArgumentException("User cannot register to finished, cancelled or already started event");
-        }
-        var registration = registrationRepository.findUserRegistration(currentUser.getId(), event.getId());
-        if(registration.isPresent()){
-            throw new IllegalArgumentException("User already registered to this event");
-        }
-        registrationRepository.save(
-                new RegistrationEntity(
-                        null,
-                        eventRepository.findById(event.getId()).orElseThrow(),
-                        currentUser.getId(),
-                        RegistrationStatus.OPENED
-                )
-        );
-    }
-
-    @Transactional
-    public void cancelRegistration(Long eventId) {
-        var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        if (event.getStatus().equals(EventStatus.STARTED) || event.getStatus().equals(EventStatus.FINISHED)) {
-            throw new IllegalArgumentException("Cannot cancel registration at started or finished event");
-        }
-        var registration = registrationRepository.findUserRegistration(currentUser.getId(), event.getId());
-        if(registration.isEmpty()){
-            throw new IllegalArgumentException("Registration not found");
-        }
-        registrationRepository.closeRegistration(currentUser.getId(), event);
-    }
-
-    @Transactional
-    public List<EventDomain> getUserRegistrations() {
-        var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var foundEvents = registrationRepository.findUserEvents(currentUser.getId());
-        return foundEvents.stream().map(universalEventMapper::entityToDomain).toList();
-    }
-
-    @Transactional
     public List<EventDomain> searchByFilter(EventSearchFilter searchFilter) {
         var foundEntities = eventRepository.findEvents(
                 searchFilter.name(),
@@ -190,7 +140,7 @@ public class EventService {
         }
     }
 
-    private void checkCapacityOfLocation(Long eventId){
-
-    }
+//    private void checkCapacityOfLocation(Long eventId){
+//
+//    }
 }

@@ -8,7 +8,6 @@ import org.example.eventmanager.events.model.event.EventSearchFilter;
 import org.example.eventmanager.events.service.EventService;
 import org.example.eventmanager.events.model.event.EventDto;
 import org.example.eventmanager.events.model.RequestEvent;
-import org.example.eventmanager.security.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +22,6 @@ public class EventController {
 
     private final EventService eventService;
     private final UniversalEventMapper universalEventMapper;
-
-    //todo вынести проверку пользователя в отдельный метод
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
@@ -78,29 +75,5 @@ public class EventController {
     public ResponseEntity<List<EventDto>> getMyEvents() {
         var userEvents = eventService.getUserEvents().stream().map(universalEventMapper::domainToDto).toList();
         return ResponseEntity.ok().body(userEvents);
-    }
-
-    @PostMapping("/registrations/{eventId}")
-    public void registerToEvent(
-            @PathVariable Long eventId
-    ) {
-        eventService.registerUserToEvent(eventId);
-    }
-
-    @DeleteMapping("/registrations/cancel/{eventId}")
-    public ResponseEntity<?> cancelRegistration(
-            @PathVariable Long eventId
-    ) {
-        eventService.cancelRegistration(eventId);
-        return ResponseEntity.status(204).body(null);
-    }
-
-    @GetMapping("/registrations/my")
-    public ResponseEntity<List<EventDto>> getMyRegistrations(
-    ) {
-        var events = eventService.getUserRegistrations();
-        return ResponseEntity.ok().body(events.stream()
-                .map(universalEventMapper::domainToDto)
-                .toList());
     }
 }
