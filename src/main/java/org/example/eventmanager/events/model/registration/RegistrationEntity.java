@@ -1,4 +1,4 @@
-package org.example.eventmanager.events.model;
+package org.example.eventmanager.events.model.registration;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @Setter
 @Table(name = "registrations")
 public class RegistrationEntity {

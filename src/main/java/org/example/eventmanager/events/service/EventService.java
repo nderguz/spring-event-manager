@@ -4,6 +4,10 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.*;
+import org.example.eventmanager.events.model.event.EventDomain;
+import org.example.eventmanager.events.model.event.EventEntity;
+import org.example.eventmanager.events.model.registration.RegistrationDomain;
+import org.example.eventmanager.events.model.registration.RegistrationEntity;
 import org.example.eventmanager.events.repository.EventRepository;
 import org.example.eventmanager.events.repository.RegistrationRepository;
 import org.example.eventmanager.location.LocationService;
@@ -12,8 +16,10 @@ import org.example.eventmanager.users.services.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -101,7 +107,6 @@ public class EventService {
     public void registerUserToEvent(String userLogin, Long eventId) throws NullPointerException {
         //todo проверка на заполненность мероприятий
 
-
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         if (event.getStatus().equals(EventStatus.FINISHED.toString()) || event.getStatus().equals(EventStatus.CANCELLED.toString())) {
             throw new IllegalArgumentException("Cannot register user to finished or cancelled event");
@@ -109,7 +114,6 @@ public class EventService {
         var user = userService.getUserByLogin(userLogin);
         var possibleRegistration = registrationRepository.findUserRegistration(user.getId(), event.getId());
 
-        //todo проверка на перезаписть закрытой записи
         if (possibleRegistration != null && Objects.equals(possibleRegistration.getRegistrationStatus(), RegistrationStatus.OPENED.name())) {
             throw new IllegalArgumentException("User already registered at this event");
         }
@@ -120,7 +124,6 @@ public class EventService {
 
     @Transactional
     public void cancelRegistration(String userLogin, Long eventId) {
-        //todo сделать правильный ответ
         var user = userService.getUserByLogin(userLogin);
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         if (event.getStatus().equals(EventStatus.STARTED.name()) || event.getStatus().equals(EventStatus.FINISHED.name())) {
@@ -129,5 +132,16 @@ public class EventService {
         var registration = registrationRepository.findUserRegistration(user.getId(), event.getId());
         registration.setRegistrationStatus(RegistrationStatus.CLOSED.name());
         registrationRepository.save(registration);
+    }
+
+    @Transactional
+    public List<EventDomain> getUserRegistrations(String userLogin) {
+        var user = userService.getUserByLogin(userLogin);
+        var eventIds =  registrationRepository.findByUserId(user.getId()).stream()
+                .map(RegistrationEntity::getEventId)
+                .toList();
+        return eventRepository.findEventsByIds(eventIds).stream()
+                .map(universalEventMapper::entityToDomain)
+                .toList();
     }
 }

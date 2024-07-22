@@ -1,7 +1,6 @@
-package org.example.eventmanager.events.model;
+package org.example.eventmanager.events.model.event;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @Data
 @Table(name = "events")
 public class EventEntity {

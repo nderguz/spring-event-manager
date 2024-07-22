@@ -1,5 +1,10 @@
 package org.example.eventmanager.events.model;
 
+import org.example.eventmanager.events.model.event.EventDomain;
+import org.example.eventmanager.events.model.event.EventDto;
+import org.example.eventmanager.events.model.event.EventEntity;
+import org.example.eventmanager.events.model.registration.RegistrationDomain;
+import org.example.eventmanager.events.model.registration.RegistrationEntity;
 import org.example.eventmanager.location.entities.Location;
 import org.example.eventmanager.users.entities.User;
 import org.springframework.stereotype.Component;
@@ -64,6 +69,15 @@ public class UniversalEventMapper {
                 entity.getId(),
                 entity.getOwnerId(),
                 EventStatus.valueOf(entity.getStatus())
+        );
+    }
+
+    public RegistrationDomain registrationEntityToDomain(RegistrationEntity entity){
+        return new RegistrationDomain(
+                entity.getRegistrationId(),
+                entity.getEventId(),
+                entity.getUserId(),
+                entity.getRegistrationStatus()
         );
     }
 }

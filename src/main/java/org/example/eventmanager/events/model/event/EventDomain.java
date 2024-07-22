@@ -1,8 +1,10 @@
-package org.example.eventmanager.events.model;
+package org.example.eventmanager.events.model.event;
+
+import org.example.eventmanager.events.model.EventStatus;
 
 import java.util.Date;
 
-public record EventDto(
+public record EventDomain (
         Integer occupiedPlaces,
         Date date,
         Integer duration,
@@ -13,5 +15,5 @@ public record EventDto(
         Long id,
         Long ownerId,
         EventStatus status
-) {
+){
 }

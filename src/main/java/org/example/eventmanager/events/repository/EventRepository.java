@@ -1,6 +1,6 @@
 package org.example.eventmanager.events.repository;
 
-import org.example.eventmanager.events.model.EventEntity;
+import org.example.eventmanager.events.model.event.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +14,9 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
     List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
+
+    @Query("SELECT e FROM EventEntity e WHERE e.id IN :eventIds")
+    List<EventEntity> findEventsByIds(
+           @Param("eventIds") List<Long> eventIds
+    );
 }

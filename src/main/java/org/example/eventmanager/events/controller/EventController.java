@@ -3,8 +3,9 @@ package org.example.eventmanager.events.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.model.UniversalEventMapper;
+import org.example.eventmanager.events.model.registration.RegistrationDomain;
 import org.example.eventmanager.events.service.EventService;
-import org.example.eventmanager.events.model.EventDto;
+import org.example.eventmanager.events.model.event.EventDto;
 import org.example.eventmanager.events.model.RequestEvent;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
 import org.springframework.http.ResponseEntity;
@@ -96,13 +97,25 @@ public class EventController {
     }
 
     @DeleteMapping("/registrations/cancel/{eventId}")
-    public void cancelRegistration(
+    public ResponseEntity<?> cancelRegistration(
             @PathVariable Long eventId,
             @RequestHeader("Authorization") String token
     ){
         var validToken = token.substring(7);
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         eventService.cancelRegistration(userLogin, eventId);
+        return ResponseEntity.status(204).body(null);
     }
 
+    @GetMapping("/registrations/my")
+    public ResponseEntity<List<EventDto>> getMyRegistrations(
+            @RequestHeader("Authorization") String token
+    ){
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        var events = eventService.getUserRegistrations(userLogin);
+        return ResponseEntity.ok().body(events.stream()
+                .map(universalEventMapper::domainToDto)
+                .toList());
+    }
 }
