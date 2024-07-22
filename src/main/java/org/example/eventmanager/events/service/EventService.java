@@ -8,6 +8,7 @@ import org.example.eventmanager.events.model.event.EventDomain;
 import org.example.eventmanager.events.model.event.EventEntity;
 import org.example.eventmanager.events.model.event.EventSearchFilter;
 import org.example.eventmanager.events.repository.EventRepository;
+import org.example.eventmanager.events.repository.RegistrationRepository;
 import org.example.eventmanager.location.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
@@ -24,6 +25,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UniversalEventMapper universalEventMapper;
     private final AuthenticationService authenticationService;
+    private final RegistrationRepository registrationRepository;
 
     //todo переделать статус регистрации
 
@@ -65,7 +67,6 @@ public class EventService {
     public EventDomain deleteEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
 
-
         var eventToDelete = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
 
         if (currentUser.getRole().equals(Roles.ADMIN) || currentUser.getId().equals(eventToDelete.getOwnerId())) {
@@ -77,6 +78,7 @@ public class EventService {
             }
             eventToDelete.setStatus(EventStatus.CANCELLED);
             eventRepository.save(eventToDelete);
+            registrationRepository.closeAllRegistrations(eventToDelete);
             return universalEventMapper.entityToDomain(eventToDelete);
         } else {
             throw new BadCredentialsException("Данный пользователь не может удалить событие");
@@ -140,7 +142,4 @@ public class EventService {
         }
     }
 
-//    private void checkCapacityOfLocation(Long eventId){
-//
-//    }
 }

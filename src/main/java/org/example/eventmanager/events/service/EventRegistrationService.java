@@ -12,7 +12,6 @@ import org.example.eventmanager.events.repository.EventRepository;
 import org.example.eventmanager.events.repository.RegistrationRepository;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -28,14 +27,13 @@ public class EventRegistrationService {
 
     @Transactional
     public void registerUserToEvent(Long eventId) {
-        //todo проверка на заполненность мероприятий
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         checkCapacityOfEvent(event.getId());
         if(event.getOwnerId().equals(currentUser.getId())){
             throw new IllegalArgumentException("Owner cannot register to the event");
         }
-        if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.CANCELLED) || event.getStatus().equals(EventStatus.STARTED)) {
+        if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.CANCELLED)) {
             throw new IllegalArgumentException("User cannot register to finished, cancelled or already started event");
         }
         var registration = registrationRepository.findUserRegistration(currentUser.getId(), event.getId());

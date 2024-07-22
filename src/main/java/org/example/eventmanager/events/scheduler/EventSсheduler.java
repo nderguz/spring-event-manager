@@ -19,7 +19,6 @@ import java.util.Objects;
 public class EventSсheduler implements EventSchedulerService {
 
     private final EventRepository eventRepository;
-//todo перепроверить шедулер
 
     @Override
     public void scheduleCheckEventStatus(EventStatus eventStatus) throws ParseException {

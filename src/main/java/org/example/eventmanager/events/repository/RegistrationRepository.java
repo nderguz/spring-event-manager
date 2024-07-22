@@ -30,4 +30,10 @@ public interface RegistrationRepository extends CrudRepository<RegistrationEntit
             @Param("user_id") Long userId,
             @Param("event") EventEntity event
     );
+
+    @Modifying
+    @Query("UPDATE RegistrationEntity SET registrationStatus = 1 WHERE event = :event")
+    void closeAllRegistrations(
+            @Param("event") EventEntity event
+    );
 }
