@@ -10,6 +10,8 @@ import org.example.eventmanager.security.jwt.JwtTokenManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/events")
 @AllArgsConstructor
@@ -66,6 +68,41 @@ public class EventController {
         var userLogin = jwtTokenManager.getLoginFromToken(validToken);
         var updatedLocation = eventService.updateEvent(eventId, userLogin, eventToUpdate);
         return ResponseEntity.ok(universalEventMapper.domainToDto(updatedLocation));
+    }
+
+    @PostMapping("/search")
+    public void searchEvents(){
+
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<EventDto>> getMyEvents(
+            @RequestHeader("Authorization") String token
+    ){
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        var userEvents = eventService.getUserEvents(userLogin).stream().map(universalEventMapper::domainToDto).toList();
+        return ResponseEntity.ok().body(userEvents);
+    }
+
+    @PostMapping("/registrations/{eventId}")
+    public void registerToEvent(
+            @PathVariable Long eventId,
+            @RequestHeader("Authorization") String token
+    ){
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        eventService.registerUserToEvent(userLogin, eventId);
+    }
+
+    @DeleteMapping("/registrations/cancel/{eventId}")
+    public void cancelRegistration(
+            @PathVariable Long eventId,
+            @RequestHeader("Authorization") String token
+    ){
+        var validToken = token.substring(7);
+        var userLogin = jwtTokenManager.getLoginFromToken(validToken);
+        eventService.cancelRegistration(userLogin, eventId);
     }
 
 }

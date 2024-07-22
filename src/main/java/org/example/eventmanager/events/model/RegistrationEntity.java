@@ -12,6 +12,8 @@ import lombok.*;
 @Table(name = "registrations")
 public class RegistrationEntity {
 
+    //todo запилить отношения
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long registrationId;
@@ -21,4 +23,7 @@ public class RegistrationEntity {
 
     @Column(name = "user_id")
     private Long userId;
+
+    @Column(name = "status")
+    private String registrationStatus;
 }

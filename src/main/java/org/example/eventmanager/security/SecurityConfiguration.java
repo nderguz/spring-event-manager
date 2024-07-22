@@ -70,9 +70,10 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority("ADMIN")
                             .requestMatchers(HttpMethod.POST, "/users").permitAll()
                             .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/events").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/events").hasAuthority("USER")
                             .requestMatchers(HttpMethod.GET, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
                             .requestMatchers(HttpMethod.DELETE, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/events/my").hasAuthority("USER")
                             .anyRequest().authenticated();
                         }
                 )

@@ -11,4 +11,7 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
     @Query("SELECT e FROM EventEntity e WHERE e.status = :status")
     List<EventEntity> findAllByStatus(@Param("status") String status);
+
+    @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
+    List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
 }

@@ -17,13 +17,15 @@ import java.util.Date;
 @Table(name = "events")
 public class EventEntity {
 
+    //todo запилить отношения
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
-    private Long id; //id события
+    private Long id;
 
     @Column(name = "location_id")
-    private Long locationId; // id локации из таблицы locations
+    private Long locationId;
 
     @Column(name = "name")
     private String name;
