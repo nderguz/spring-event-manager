@@ -5,6 +5,5 @@ import org.example.eventmanager.events.domain.EventStatus;
 import java.text.ParseException;
 
 public interface EventSchedulerService {
-
     void scheduleCheckEventStatus(EventStatus eventStatus) throws ParseException;
 }

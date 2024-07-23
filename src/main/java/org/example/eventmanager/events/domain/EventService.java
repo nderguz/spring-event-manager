@@ -12,6 +12,7 @@ import org.example.eventmanager.events.db.RegistrationRepository;
 import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
+import org.example.eventmanager.users.domain.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -30,9 +31,9 @@ public class EventService {
     @Transactional
     public EventDomain createEvent(RequestEvent eventToCreate) {
 
-        //todo проверки на валидность мероприятия, и также на занятую дату
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var locationInfo = locationService.getLocationById(eventToCreate.locationId());
+        checkAvailableLocationDate(eventToCreate);
         if(locationInfo.capacity() < eventToCreate.maxPlaces()){
             throw new IllegalArgumentException("Capacity of location is: %s, but maxPlaces is: %s".formatted(locationInfo.capacity(), eventToCreate.maxPlaces()));
         }
@@ -46,11 +47,10 @@ public class EventService {
                 eventToCreate.cost(),
                 eventToCreate.duration(),
                 eventToCreate.date(),
+                eventToCreate.date().plusMinutes(eventToCreate.duration()),
                 List.of()
         );
-        log.info("Saving event {}.", eventEntity);
         var savedEvent = eventRepository.save(eventEntity);
-        log.info("Created event with id: '{}'", savedEvent.getId());
         return universalEventMapper.entityToDomain(savedEvent);
     }
 
@@ -84,17 +84,18 @@ public class EventService {
 
     @Transactional
     public EventDomain updateEvent(Long eventId, RequestEvent eventToUpdate) {
-        //todo проверки на валидность события
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        checkCurrentUserCanModifyEvent(currentUser.getId());
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        checkCurrentUserCanModifyEvent(event, currentUser);
+        checkAvailableLocationDate(eventToUpdate);
         if (currentUser.getRole().toString().equals(Roles.ADMIN.toString()) || currentUser.getId().equals(event.getOwnerId())) {
-            event.setDate(eventToUpdate.date());
+            event.setDateStart(eventToUpdate.date());
             event.setCost(eventToUpdate.cost());
             event.setDuration(eventToUpdate.duration());
             event.setMaxPlaces(eventToUpdate.maxPlaces());
             event.setLocationId(eventToUpdate.locationId());
             event.setName(eventToUpdate.name());
+            event.setDateEnd(eventToUpdate.date().plusMinutes(eventToUpdate.duration()));
             var updatedEvent = eventRepository.save(event);
             return universalEventMapper.entityToDomain(updatedEvent);
         } else {
@@ -130,12 +131,16 @@ public class EventService {
                 .toList();
     }
 
-    private void checkCurrentUserCanModifyEvent(Long eventId){
-        var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var event = getEventById(eventId);
-
-        if(!event.ownerId().equals(currentUser.getId()) && !currentUser.getRole().equals(Roles.ADMIN)){
+    private void checkCurrentUserCanModifyEvent(EventEntity event, User currentUser){
+        if(!event.getOwnerId().equals(currentUser.getId()) && !currentUser.getRole().equals(Roles.ADMIN)){
             throw new IllegalArgumentException("This user cannot modify this event");
+        }
+    }
+
+    private void checkAvailableLocationDate(RequestEvent event){
+        var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
+        if(!events.isEmpty()){
+            throw new IllegalArgumentException("Location already reserved at this date");
         }
     }
 

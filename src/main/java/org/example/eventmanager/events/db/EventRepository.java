@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,11 +23,23 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     @Query("""
             SELECT e FROM EventEntity e 
+            WHERE (e.locationId = :location_id) 
+            AND (e.dateStart < :date_end)
+            AND (e.dateEnd > :date_start)
+            """)
+    List<EventEntity> findEventByDate(
+            @Param("date_start") LocalDateTime start,
+            @Param("date_end") LocalDateTime end,
+            @Param("location_id") Long locationId
+        );
+
+    @Query("""
+            SELECT e FROM EventEntity e 
             WHERE (:name IS NULL OR e.name LIKE %:name%) 
             AND (:placesMin IS NULL OR e.maxPlaces >= :placesMin) 
             AND (:placesMax IS NULL OR e.maxPlaces <= :placesMax) 
-            AND (CAST(:dateStartAfter as date) IS NULL OR e.date >= :dateStartAfter) 
-            AND (CAST(:dateStartBefore as date) IS NULL OR e.date <= :dateStartBefore) 
+            AND (CAST(:dateStartAfter as date) IS NULL OR e.dateStart >= :dateStartAfter) 
+            AND (CAST(:dateStartBefore as date) IS NULL OR e.dateStart <= :dateStartBefore) 
             AND (:costMin IS NULL OR e.cost >= :costMin) 
             AND (:costMax IS NULL OR e.cost <= :costMax) 
             AND (:durationMin IS NULL OR e.duration >= :durationMin) 

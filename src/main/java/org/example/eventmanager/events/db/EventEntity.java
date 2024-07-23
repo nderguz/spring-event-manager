@@ -44,8 +44,11 @@ public class EventEntity {
     @Column(name = "duration", nullable = false)
     private Integer duration;
 
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    @Column(name = "date_start", nullable = false)
+    private LocalDateTime dateStart;
+
+    @Column(name = "date_end", nullable = false)
+    private LocalDateTime dateEnd;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RegistrationEntity> registrations;

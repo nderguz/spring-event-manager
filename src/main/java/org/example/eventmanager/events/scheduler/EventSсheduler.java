@@ -23,8 +23,7 @@ public class EventSсheduler implements EventSchedulerService {
         LocalDateTime dateTime = LocalDateTime.now();
         List<EventEntity> events = eventRepository.findAllByStatus(eventStatus);
         for (EventEntity event : events) {
-            var date = event.getDate();
-
+            var date = event.getDateStart();
             if (Objects.equals(event.getStatus(), EventStatus.WAITING)) {
                 if (dateTime.isAfter(date)) {
                     event.setStatus(EventStatus.STARTED);
@@ -32,8 +31,7 @@ public class EventSсheduler implements EventSchedulerService {
                 }
             }
             else if (Objects.equals(event.getStatus(), EventStatus.STARTED)) {
-                LocalDateTime eventEndDate = date.plusMinutes(event.getDuration());
-                if (dateTime.isAfter(eventEndDate)) {
+                if (dateTime.isAfter(event.getDateEnd())) {
                     event.setStatus(EventStatus.FINISHED);
                     eventRepository.save(event);
                 }

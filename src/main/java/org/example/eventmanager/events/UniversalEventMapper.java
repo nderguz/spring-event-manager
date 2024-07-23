@@ -31,7 +31,7 @@ public class UniversalEventMapper {
                         it.getUserId(),
                         entity.getId()
                 )).toList(),
-                entity.getDate(),
+                entity.getDateStart(),
                 entity.getDuration(),
                 entity.getCost(),
                 entity.getMaxPlaces(),
