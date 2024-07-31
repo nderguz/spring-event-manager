@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.eventmanager.events.domain.EventStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
@@ -39,16 +41,16 @@ public class EventEntity {
     private Integer maxPlaces;
 
     @Column(name = "cost", nullable = false)
-    private Integer cost;
+    private BigDecimal cost;
 
     @Column(name = "duration", nullable = false)
     private Integer duration;
 
     @Column(name = "date_start", nullable = false)
-    private LocalDateTime dateStart;
+    private ZonedDateTime dateStart;
 
     @Column(name = "date_end", nullable = false)
-    private LocalDateTime dateEnd;
+    private ZonedDateTime dateEnd;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RegistrationEntity> registrations;

@@ -33,11 +33,11 @@ public class AuthenticationService {
 
     public User getCurrentAuthenticatedUser(){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if(authentication == null){
             throw new IllegalStateException("Authentication not present");
         }
-        var userName = authentication.getName();
-        return userService.getUserByLogin(userName);
+        return (User) authentication.getPrincipal();
+//        var userName = authentication.getName();
+//        return userService.getUserByLogin(userName);
     }
 }

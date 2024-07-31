@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.eventmanager.users.domain.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 
     private final JwtTokenManager jwtTokenManager;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -48,8 +50,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         var login = jwtTokenManager.getLoginFromToken(jwtToken);
         var role = jwtTokenManager.getRoleFromToken(jwtToken);
+        var user = userService.getUserByLogin(login);
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(login, null, List.of(new SimpleGrantedAuthority(role)));
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                List.of(new SimpleGrantedAuthority(role)));
         SecurityContextHolder.getContext().setAuthentication(token);
         filterChain.doFilter(request, response);
     }

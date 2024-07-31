@@ -1,13 +1,14 @@
 package org.example.eventmanager.events.domain;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public record EventDomain (
         List<Registration> occupiedPlaces,
-        LocalDateTime date,
+        ZonedDateTime date,
         Integer duration,
-        Integer cost,
+        BigDecimal cost,
         Integer maxPlaces,
         Long locationId,
         String name,

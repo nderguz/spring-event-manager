@@ -2,13 +2,14 @@ package org.example.eventmanager.events.api;
 
 import org.example.eventmanager.events.domain.EventStatus;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 public record EventDto(
         Integer occupiedPlaces,
-        LocalDateTime date,
+        ZonedDateTime date,
         Integer duration,
-        Integer cost,
+        BigDecimal cost,
         Integer maxPlaces,
         Long locationId,
         String name,
