@@ -23,7 +23,7 @@ public class EventRegistrationController {
     }
 
     @DeleteMapping("/cancel/{eventId}")
-    public ResponseEntity<?> cancelRegistration(
+    public ResponseEntity<Void> cancelRegistration(
             @PathVariable Long eventId
     ) {
         eventRegistrationService.cancelRegistration(eventId);
