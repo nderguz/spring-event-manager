@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Repository
@@ -28,8 +29,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             AND (e.dateEnd > :date_start)
             """)
     List<EventEntity> findEventByDate(
-            @Param("date_start") LocalDateTime start,
-            @Param("date_end") LocalDateTime end,
+            @Param("date_start") ZonedDateTime start,
+            @Param("date_end") ZonedDateTime end,
             @Param("location_id") Long locationId
         );
 
@@ -51,10 +52,10 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("name") String name,
             @Param("placesMin") Integer placesMin,
             @Param("placesMax") Integer placesMax,
-            @Param("dateStartAfter") LocalDateTime dateStartAfter,
-            @Param("dateStartBefore") LocalDateTime dateStartBefore,
-            @Param("costMin") Long costMin,
-            @Param("costMax") Long costMax,
+            @Param("dateStartAfter") ZonedDateTime dateStartAfter,
+            @Param("dateStartBefore") ZonedDateTime dateStartBefore,
+            @Param("costMin") BigDecimal costMin,
+            @Param("costMax") BigDecimal costMax,
             @Param("durationMin") Integer durationMin,
             @Param("durationMax") Integer durationMax,
             @Param("locationId") Long locationId,

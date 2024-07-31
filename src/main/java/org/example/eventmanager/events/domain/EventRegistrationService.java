@@ -31,7 +31,7 @@ public class EventRegistrationService {
             throw new IllegalArgumentException("Owner cannot register to the event");
         }
         if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.CANCELLED)) {
-            throw new IllegalArgumentException("User cannot register to finished, cancelled or already started event");
+            throw new IllegalArgumentException("User cannot register to finished or cancelled event");
         }
         var registration = registrationRepository.findUserRegistration(currentUser.getId(), event.getId());
         if(registration.isPresent()){
