@@ -9,7 +9,7 @@ public record EventDomain (
         ZonedDateTime date,
         Integer duration,
         BigDecimal cost,
-        Integer maxPlaces,
+        Long maxPlaces,
         Long locationId,
         String name,
         Long id,

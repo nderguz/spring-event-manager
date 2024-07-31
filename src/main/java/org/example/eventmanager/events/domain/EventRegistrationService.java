@@ -21,8 +21,6 @@ public class EventRegistrationService {
     private final RegistrationRepository registrationRepository;
     private final UniversalEventMapper universalEventMapper;
 
-
-    @Transactional
     public void registerUserToEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
@@ -47,7 +45,6 @@ public class EventRegistrationService {
         );
     }
 
-    @Transactional
     public void cancelRegistration(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
@@ -61,7 +58,6 @@ public class EventRegistrationService {
         registrationRepository.closeRegistration(currentUser.getId(), event);
     }
 
-    @Transactional
     public List<EventDomain> getUserRegistrations() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var foundEvents = registrationRepository.findUserEvents(currentUser.getId());

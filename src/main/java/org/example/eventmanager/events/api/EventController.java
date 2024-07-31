@@ -21,10 +21,10 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
-            @RequestBody RequestEvent eventToCreate
+            @RequestBody @Valid RequestEvent eventToCreate
     ) {
         var createdEvent = eventService.createEvent(eventToCreate);
-        return ResponseEntity.status(201).body(universalEventMapper.domainToDto(createdEvent));
+        return ResponseEntity.status(HttpStatus.CREATED).body(universalEventMapper.domainToDto(createdEvent));
     }
 
     @DeleteMapping("/{eventId}")
@@ -33,7 +33,7 @@ public class EventController {
     ) {
 
         var eventToDelete = eventService.deleteEvent(eventId);
-        return ResponseEntity.status(204).body(universalEventMapper.domainToDto(eventToDelete));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(universalEventMapper.domainToDto(eventToDelete));
     }
 
     @GetMapping("/{eventId}")
@@ -47,7 +47,7 @@ public class EventController {
     @PutMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable Long eventId,
-            @RequestBody RequestEvent eventToUpdate
+            @RequestBody UpdateEvent eventToUpdate
     ) {
         var updatedLocation = eventService.updateEvent(eventId, eventToUpdate);
         return ResponseEntity.ok(universalEventMapper.domainToDto(updatedLocation));
@@ -70,6 +70,6 @@ public class EventController {
     @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getMyEvents() {
         var userEvents = eventService.getUserEvents().stream().map(universalEventMapper::domainToDto).toList();
-        return ResponseEntity.ok().body(userEvents);
+        return ResponseEntity.status(HttpStatus.OK).body(userEvents);
     }
 }

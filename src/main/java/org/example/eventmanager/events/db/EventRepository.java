@@ -1,7 +1,9 @@
 package org.example.eventmanager.events.db;
 
+import jakarta.transaction.Transactional;
 import org.example.eventmanager.events.domain.EventStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,17 +13,28 @@ import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
+    @Transactional
     @Query("SELECT e FROM EventEntity e WHERE e.status = :status")
     List<EventEntity> findAllByStatus(@Param("status") EventStatus status);
 
     @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
     List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE EventEntity e SET e.status = :status where e.id = :id")
+    void changeEventStatus(
+            @Param("id") Long eventId,
+            @Param("status") EventStatus eventStatus
+    );
+
+    @Transactional
     @Query("SELECT e.registrations FROM EventEntity e JOIN e.registrations r WHERE e.id = :eventId AND r.registrationStatus = 0")
     List <RegistrationEntity> getEventOpenedRegistrations(
             @Param("eventId") Long eventId
     );
 
+    @Transactional
     @Query("""
             SELECT e FROM EventEntity e 
             WHERE (e.locationId = :location_id) 
@@ -34,6 +47,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("location_id") Long locationId
         );
 
+    @Transactional
     @Query("""
             SELECT e FROM EventEntity e 
             WHERE (:name IS NULL OR e.name LIKE %:name%) 
@@ -50,8 +64,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             """)
     List<EventEntity> findEvents(
             @Param("name") String name,
-            @Param("placesMin") Integer placesMin,
-            @Param("placesMax") Integer placesMax,
+            @Param("placesMin") Long placesMin,
+            @Param("placesMax") Long placesMax,
             @Param("dateStartAfter") ZonedDateTime dateStartAfter,
             @Param("dateStartBefore") ZonedDateTime dateStartBefore,
             @Param("costMin") BigDecimal costMin,

@@ -38,7 +38,7 @@ public class EventEntity {
     private Long ownerId;
 
     @Column(name = "max_places", nullable = false)
-    private Integer maxPlaces;
+    private Long maxPlaces;
 
     @Column(name = "cost", nullable = false)
     private BigDecimal cost;
