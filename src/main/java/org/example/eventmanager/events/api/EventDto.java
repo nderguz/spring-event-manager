@@ -10,7 +10,7 @@ public record EventDto(
         ZonedDateTime date,
         Integer duration,
         BigDecimal cost,
-        Integer maxPlaces,
+        Long maxPlaces,
         Long locationId,
         String name,
         Long id,

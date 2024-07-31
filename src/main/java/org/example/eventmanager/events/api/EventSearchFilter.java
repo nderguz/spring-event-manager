@@ -7,8 +7,8 @@ import java.time.ZonedDateTime;
 
 public record EventSearchFilter (
         String name,
-        Integer placesMin,
-        Integer placesMax,
+        Long placesMin,
+        Long placesMax,
         ZonedDateTime dateStartAfter,
         ZonedDateTime dateStartBefore,
         BigDecimal costMin,
