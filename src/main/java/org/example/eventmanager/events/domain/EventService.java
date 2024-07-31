@@ -77,7 +77,6 @@ public class EventService {
         }
     }
 
-    //todo заменить объект по созданию события
     public EventDomain updateEvent(Long eventId, UpdateEvent eventToUpdate) {
         checkCurrentUserCanModifyEvent(eventId);
         checkAvailableLocationDate(eventToUpdate);
@@ -93,16 +92,17 @@ public class EventService {
             throw new IllegalArgumentException("Registration count is more than max places");
         }
 
-        //todo проблема с датой
+        Optional.ofNullable(eventToUpdate.date()).ifPresent(event::setDateStart);
         Optional.ofNullable(eventToUpdate.name()).ifPresent(event::setName);
         Optional.ofNullable(eventToUpdate.locationId()).ifPresent(event::setLocationId);
         Optional.ofNullable(eventToUpdate.maxPlaces()).ifPresent(event::setMaxPlaces);
         Optional.ofNullable(eventToUpdate.cost()).ifPresent(event::setCost);
         Optional.ofNullable(eventToUpdate.duration()).ifPresent(event::setDuration);
-        Optional.ofNullable(eventToUpdate.date()).ifPresent(event::setDateStart);
+        Optional.ofNullable(eventToUpdate.date().plusMinutes(eventToUpdate.duration())).ifPresent(event::setDateEnd);
 
         eventRepository.save(event);
-
+        log.info("Updated event: {}", event);
+        System.out.println();
         return universalEventMapper.entityToDomain(event);
     }
 
@@ -149,6 +149,9 @@ public class EventService {
 
     private void checkAvailableLocationDate(UpdateEvent event) {
         var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
+        if(events.size() == 1){
+            return;
+        }
         if (!events.isEmpty()) {
             throw new IllegalArgumentException("Location already reserved at this date");
         }
