@@ -1,13 +1,16 @@
-# Используем официальный образ Maven с JDK 17 для сборки приложения
-FROM maven:3.9.7-openjdk-22 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
+FROM maven:3.9.4-eclipse-temurin-17 as build
 
-# Используем официальный образ OpenJDK 22 для запуска приложения
-FROM openjdk:22-jdk
+COPY src src
+COPY pom.xml pom.xml
+RUN mvn clean package dependency:copy-dependencies -DskipTests -DincludeScope=runtime
+
+FROM bellsoft/liberica-openjdk-debian:22
+
+RUN adduser --system spring-boot && addgroup --system spring-boot && adduser spring-boot spring-boot
+USER spring-boot
+
 WORKDIR /app
-COPY --from=build /app/target/*.jar ./event-manager.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/event-manager.jar"]
+COPY --from=build target/dependency ./lib
+COPY --from=build target/event-manager-0.0.1-SNAPSHOT.jar ./application.jar
+
+ENTRYPOINT ["java", "-cp", "./lib/*:./application.jar", "org.example.eventmanager.EventManagerApplication"]
