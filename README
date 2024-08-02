@@ -1,3 +1,5 @@
 Запуск приложения в контейнерах:
 
-docker-compose-up
+docker-compose-up для первого запуска
+
+ocker-compose up --build  для пересборки образов контейнеров
