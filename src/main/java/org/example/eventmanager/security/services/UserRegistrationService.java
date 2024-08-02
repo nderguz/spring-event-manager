@@ -1,6 +1,7 @@
 package org.example.eventmanager.security.services;
 
 import lombok.AllArgsConstructor;
+import org.example.eventmanager.kafka.KafkaSender;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.domain.UserService;
 import org.example.eventmanager.security.entities.SignUpRequest;
@@ -14,6 +15,7 @@ public class UserRegistrationService {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final KafkaSender kafkaSender;
 
     public User registerUser(SignUpRequest signUpRequest) {
         if(userService.isUserExistsByLogin(signUpRequest.login())){
@@ -27,6 +29,8 @@ public class UserRegistrationService {
                 signUpRequest.age(),
                 Roles.USER
         );
+        kafkaSender.sendMessage("User", user.toString());
+
         return userService.saveUser(user);
     }
 }
