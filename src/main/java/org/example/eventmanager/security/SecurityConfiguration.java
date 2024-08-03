@@ -62,6 +62,7 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(authorize ->{
                     authorize
+                            .requestMatchers(HttpMethod.GET, "/kafka/hello").permitAll()
                             .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/locations").hasAuthority("ADMIN")
                             .requestMatchers(HttpMethod.DELETE, "/locations/**").hasAuthority("ADMIN")
