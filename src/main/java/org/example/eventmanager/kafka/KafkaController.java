@@ -16,9 +16,9 @@ public class KafkaController {
 
     @GetMapping("/hello")
     public void hello(){
-        var msg = new KafkaMessage();
-        msg.setMessage("Hello World");
-        sender.sendMessage("events", msg);
+//        var msg = new KafkaMessage();
+//        msg.setMessage("Hello World");
+        sender.sendMessage("events", "Hello consumer!");
         log.info("Message sent to Kafka");
     }
 }

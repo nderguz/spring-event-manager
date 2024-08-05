@@ -1,15 +1,19 @@
 package org.example.eventmanager.kafka;
 
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@Slf4j
 public class KafkaSender {
-    private final KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
-    public void sendMessage(String topic, KafkaMessage message) {
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    public void sendMessage(String topic, String message) {
         kafkaTemplate.send(topic, message);
+        log.info("Message sent to topic " + topic + " : " + message);
     }
 }
