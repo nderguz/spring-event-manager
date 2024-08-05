@@ -14,4 +14,17 @@ public class User{
     private String passwordHash;
     private Integer age;
     private Roles role;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", age=" + age +
+                ", role=" + role +
+                '}';
+    }
 }
+
+
