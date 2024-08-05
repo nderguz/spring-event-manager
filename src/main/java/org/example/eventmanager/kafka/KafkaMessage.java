@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class KafkaMessage {
-    private String myMessage;
+    private String message;
 }

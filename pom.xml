@@ -20,7 +20,6 @@
 		<maven.compiler.target>22</maven.compiler.target>
 		<maven.compiler.release>22</maven.compiler.release>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
