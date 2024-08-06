@@ -10,12 +10,13 @@ import org.example.eventmanager.events.db.EventEntity;
 import org.example.eventmanager.events.api.EventSearchFilter;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
+import org.example.eventmanager.kafka.KafkaSender;
 import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
+import org.example.eventmanager.users.db.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ public class EventService {
     private final UniversalEventMapper universalEventMapper;
     private final AuthenticationService authenticationService;
     private final RegistrationRepository registrationRepository;
+    private final UserRepository userRepository;
+    private final KafkaSender kafkaSender;
 
     public EventDomain createEvent(RequestEvent eventToCreate) {
 
@@ -62,15 +65,26 @@ public class EventService {
 
     public EventDomain deleteEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-
-        var eventToDelete = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-
+        var eventToDelete = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        var oldEventToKafka = universalEventMapper.entityToDomain(eventToDelete);
         if (currentUser.getRole().equals(Roles.ADMIN) || currentUser.getId().equals(eventToDelete.getOwnerId())) {
             if (!eventToDelete.getStatus().equals(EventStatus.WAITING)) {
                 throw new IllegalArgumentException("Cannot delete started, finished or closed events");
             }
             eventRepository.changeEventStatus(eventId, EventStatus.CANCELLED);
+
+            //todo подумать над сокращением кода
             registrationRepository.closeAllRegistrations(eventToDelete);
+            var redundantEvent = new UpdateEvent(
+                    eventToDelete.getDateStart(),
+                    eventToDelete.getDuration(),
+                    eventToDelete.getCost(),
+                    eventToDelete.getMaxPlaces(),
+                    eventToDelete.getLocationId(),
+                    eventToDelete.getName()
+            );
+            kafkaSender.sendMessageToKafka(oldEventToKafka, redundantEvent, EventStatus.CANCELLED);
             return universalEventMapper.entityToDomain(eventToDelete);
         } else {
             throw new BadCredentialsException("Данный пользователь не может удалить событие");
@@ -80,7 +94,11 @@ public class EventService {
     public EventDomain updateEvent(Long eventId, UpdateEvent eventToUpdate) {
         checkCurrentUserCanModifyEvent(eventId);
         checkAvailableLocationDate(eventToUpdate);
-        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        var oldEventToKafka = universalEventMapper.entityToDomain(event);
+        var retroEvent  = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         if (!event.getStatus().equals(EventStatus.WAITING)) {
             throw new IllegalArgumentException("Cannot update event in status: %s".formatted(event.getStatus()));
         }
@@ -101,8 +119,7 @@ public class EventService {
         Optional.ofNullable(eventToUpdate.date().plusMinutes(eventToUpdate.duration())).ifPresent(event::setDateEnd);
 
         eventRepository.save(event);
-        log.info("Updated event: {}", event);
-        System.out.println();
+        kafkaSender.sendMessageToKafka(oldEventToKafka, eventToUpdate, event.getStatus());
         return universalEventMapper.entityToDomain(event);
     }
 
@@ -163,5 +180,4 @@ public class EventService {
             throw new IllegalArgumentException("Capacity of location is smaller than capacity of event");
         }
     }
-
 }

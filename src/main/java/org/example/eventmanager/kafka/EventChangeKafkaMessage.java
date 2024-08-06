@@ -1,19 +1,20 @@
 package org.example.eventmanager.kafka;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.example.eventmanager.events.domain.EventStatus;
-
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 @AllArgsConstructor
+@Data
 public class EventChangeKafkaMessage {
 
     private Long eventId;
     private final List<Long> users;
     private final Long ownerId;
-    private final Long changedById;
+//    private final Long changedById;
 
     private EventFieldChange<String> name;
     private EventFieldChange<Long> maxPlaces;

@@ -4,9 +4,7 @@ package org.example.eventmanager.events.db;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.eventmanager.events.domain.EventStatus;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
