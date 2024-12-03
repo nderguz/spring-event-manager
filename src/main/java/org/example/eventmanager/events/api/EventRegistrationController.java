@@ -1,6 +1,7 @@
 package org.example.eventmanager.events.api;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.eventmanager.events.UniversalEventMapper;
 import org.example.eventmanager.events.domain.EventRegistrationService;
 import org.springframework.http.ResponseEntity;
@@ -9,17 +10,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/events/registrations")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EventRegistrationController {
 
-    private final UniversalEventMapper universalEventMapper;
     private final EventRegistrationService eventRegistrationService;
 
     @PostMapping("/{eventId}")
-    public void registerToEvent(
+    public ResponseEntity<Void> registerToEvent(
             @PathVariable Long eventId
     ) {
         eventRegistrationService.registerUserToEvent(eventId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/cancel/{eventId}")
@@ -27,16 +28,13 @@ public class EventRegistrationController {
             @PathVariable Long eventId
     ) {
         eventRegistrationService.cancelRegistration(eventId);
-        return ResponseEntity.status(204).body(null);
+        return ResponseEntity.status(204).build();
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getMyRegistrations(
     ) {
-        var events = eventRegistrationService.getUserRegistrations();
-        return ResponseEntity.ok().body(events.stream()
-                .map(universalEventMapper::domainToDto)
-                .toList());
+        return ResponseEntity.ok().body(eventRegistrationService.getUserRegistrations());
     }
 
 }

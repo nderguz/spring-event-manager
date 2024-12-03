@@ -26,5 +26,6 @@ public class RegistrationEntity {
     private Long userId;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private RegistrationStatus registrationStatus;
 }

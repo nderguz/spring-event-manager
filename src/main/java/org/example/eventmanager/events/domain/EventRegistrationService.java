@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
+import org.example.eventmanager.events.api.EventDto;
 import org.example.eventmanager.events.db.RegistrationEntity;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
@@ -23,7 +24,8 @@ public class EventRegistrationService {
 
     public void registerUserToEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         checkCapacityOfEvent(event.getId());
         if(event.getOwner().getId().equals(currentUser.getId())){
             throw new IllegalArgumentException("Owner cannot register to the event");
@@ -58,10 +60,11 @@ public class EventRegistrationService {
         registrationRepository.closeRegistration(currentUser.getId(), event);
     }
 
-    public List<EventDomain> getUserRegistrations() {
+    public List<EventDto> getUserRegistrations() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var foundEvents = registrationRepository.findUserEvents(currentUser.getId());
-        return foundEvents.stream().map(universalEventMapper::entityToDomain).toList();
+        var foundEvents = registrationRepository.findUserEvents(currentUser.getId()).stream()
+                .map(universalEventMapper::entityToDomain).toList();
+        return foundEvents.stream().map(universalEventMapper::domainToDto).toList();
     }
 
     private void checkCapacityOfEvent(Long eventId){
