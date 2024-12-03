@@ -2,6 +2,7 @@ package org.example.eventmanager.location.api;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.location.UniversalLocationMapper;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/locations")
 @Slf4j
 public class LocationController {

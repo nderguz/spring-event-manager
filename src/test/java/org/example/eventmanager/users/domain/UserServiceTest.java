@@ -1,5 +1,6 @@
 package org.example.eventmanager.users.domain;
 import jakarta.persistence.EntityNotFoundException;
+import jdk.jfr.Description;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.UniversalUserMapper;
 import org.example.eventmanager.users.db.UserEntity;
@@ -37,7 +38,7 @@ class UserServiceTest {
                 "user",
                 "user",
                 21,
-                "USER"
+                Roles.USER
         );
         user = new User(
                 1L,
@@ -51,16 +52,18 @@ class UserServiceTest {
     @Test
     void isUserExistsByLogin() {
         when(userRepository.findByLogin("user")).thenReturn(Optional.ofNullable(userEntity));
+
         Optional<UserEntity> foundUser = userRepository.findByLogin("user");
+
         assertTrue(foundUser.isPresent());
         assertEquals(userEntity.getLogin(), foundUser.get().getLogin());
-
     }
 
     @Test
-    void saveUser() {
+    void registerNewUser() {
         User user = new User(1L, "user1", "passwordHash", 25, Roles.USER);
-        UserEntity userEntity = new UserEntity(1L, "user1", "passwordHash", 25, "USER");
+        UserEntity userEntity = new UserEntity(1L, "user1", "passwordHash", 25, Roles.USER);
+
         when(universalUserMapper.domainToEntity(any(User.class))).thenReturn(userEntity);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
         when(universalUserMapper.entityToDomain(any(UserEntity.class))).thenReturn(user);
@@ -78,7 +81,7 @@ class UserServiceTest {
     @Test
     void getUserByLogin() {
         String login = "user1";
-        UserEntity userEntity = new UserEntity(1L, login, "passwordHash", 25, "USER");
+        UserEntity userEntity = new UserEntity(1L, login, "passwordHash", 25, Roles.USER);
         User user = new User(1L, login, "passwordHash", 25, Roles.USER);
 
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(userEntity));
@@ -109,8 +112,6 @@ class UserServiceTest {
     @Test
     void findUserById() {
         Long userId = 1L;
-        UserEntity userEntity = new UserEntity(userId, "user1", "passwordHash", 25, "USER");
-        User user = new User(userId, "user1", "passwordHash", 25, Roles.USER);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
         when(universalUserMapper.entityToDomain(userEntity)).thenReturn(user);

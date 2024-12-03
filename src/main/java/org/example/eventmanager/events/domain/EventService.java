@@ -1,27 +1,33 @@
 package org.example.eventmanager.events.domain;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
+import org.example.eventmanager.events.api.EventDto;
+import org.example.eventmanager.events.api.EventSearchFilter;
 import org.example.eventmanager.events.api.RequestEvent;
 import org.example.eventmanager.events.api.UpdateEvent;
 import org.example.eventmanager.events.db.EventEntity;
-import org.example.eventmanager.events.api.EventSearchFilter;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
-import org.example.eventmanager.kafka.KafkaSender;
+import org.example.eventmanager.location.UniversalLocationMapper;
+import org.example.eventmanager.location.domain.Location;
 import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
-import org.example.eventmanager.users.db.UserRepository;
+import org.example.eventmanager.users.UniversalUserMapper;
+import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class EventService {
 
@@ -30,107 +36,81 @@ public class EventService {
     private final UniversalEventMapper universalEventMapper;
     private final AuthenticationService authenticationService;
     private final RegistrationRepository registrationRepository;
-    private final UserRepository userRepository;
-    private final KafkaSender kafkaSender;
+    private final UniversalLocationMapper universalLocationMapper;
+    private final UniversalUserMapper universalUserMapper;
 
-    public EventDomain createEvent(RequestEvent eventToCreate) {
-
+    @Transactional
+    public EventDto createEvent(RequestEvent eventToCreate) {
+        checkAvailableLocationDate(eventToCreate);
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var locationInfo = locationService.getLocationById(eventToCreate.locationId());
-        checkAvailableLocationDate(eventToCreate);
         if (locationInfo.capacity() < eventToCreate.maxPlaces()) {
             throw new IllegalArgumentException("Capacity of location is: %s, but maxPlaces is: %s".formatted(locationInfo.capacity(), eventToCreate.maxPlaces()));
         }
-        var eventEntity = new EventEntity(
-                null,
-                eventToCreate.locationId(),
-                eventToCreate.name(),
-                EventStatus.WAITING,
-                currentUser.getId(),
-                eventToCreate.maxPlaces(),
-                eventToCreate.cost(),
-                eventToCreate.duration(),
-                eventToCreate.date(),
-                eventToCreate.date().plusMinutes(eventToCreate.duration()),
-                List.of()
-        );
-        var savedEvent = eventRepository.save(eventEntity);
-        return universalEventMapper.entityToDomain(savedEvent);
+        var savedEvent = eventRepository.save(buildNewEventEntity(eventToCreate, currentUser, locationInfo));
+        return buildNewEventDto(savedEvent);
     }
 
-    public EventDomain getEventById(Long eventId) {
-        return universalEventMapper.entityToDomain(eventRepository.findById(eventId)
+    @Transactional(readOnly = true)
+    public EventDto getEventById(Long eventId) {
+        var foundEvent = universalEventMapper.entityToDomain(eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found by id: %s".formatted(eventId))));
+        return universalEventMapper.domainToDto(foundEvent);
     }
 
-    public EventDomain deleteEvent(Long eventId) {
+
+    @Transactional
+    public void deleteEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var eventToDelete = eventRepository.findById(eventId)
+        var toDeleteCandidate = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        var oldEventToKafka = universalEventMapper.entityToDomain(eventToDelete);
-        if (currentUser.getRole().equals(Roles.ADMIN) || currentUser.getId().equals(eventToDelete.getOwnerId())) {
-            if (!eventToDelete.getStatus().equals(EventStatus.WAITING)) {
+        if (currentUser.getRole().equals(Roles.ADMIN) || currentUser.getId().equals(toDeleteCandidate.getOwner().getId())) {
+
+            log.warn("Attempt to delete an event that does not belong to an administrator by user with id =%s.".formatted(currentUser.getId()));
+
+            if (!toDeleteCandidate.getStatus().equals(EventStatus.WAITING)) {
                 throw new IllegalArgumentException("Cannot delete started, finished or closed events");
             }
             eventRepository.changeEventStatus(eventId, EventStatus.CANCELLED);
-
-            //todo подумать над сокращением кода
-            registrationRepository.closeAllRegistrations(eventToDelete);
-            var redundantEvent = new UpdateEvent(
-                    eventToDelete.getDateStart(),
-                    eventToDelete.getDuration(),
-                    eventToDelete.getCost(),
-                    eventToDelete.getMaxPlaces(),
-                    eventToDelete.getLocationId(),
-                    eventToDelete.getName()
-            );
-            kafkaSender.sendMessageToKafka(oldEventToKafka, redundantEvent, EventStatus.CANCELLED);
-            return universalEventMapper.entityToDomain(eventToDelete);
+            registrationRepository.closeAllRegistrations(toDeleteCandidate);
         } else {
             throw new BadCredentialsException("Данный пользователь не может удалить событие");
         }
     }
 
-    public EventDomain updateEvent(Long eventId, UpdateEvent eventToUpdate) {
+    @Transactional
+    public EventDto updateEvent(Long eventId, UpdateEvent eventToUpdate) {
         checkCurrentUserCanModifyEvent(eventId);
         checkAvailableLocationDate(eventToUpdate);
         var event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        var oldEventToKafka = universalEventMapper.entityToDomain(event);
-        var retroEvent  = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        if (!event.getStatus().equals(EventStatus.WAITING)) {
-            throw new IllegalArgumentException("Cannot update event in status: %s".formatted(event.getStatus()));
-        }
-        if (eventToUpdate.maxPlaces() != null || eventToUpdate.locationId() != null) {
-            checkCapacityOfLocation(eventToUpdate.locationId(), eventToUpdate.maxPlaces());
-        }
-
-        if (eventToUpdate.maxPlaces() != null && event.getRegistrations().size() > eventToUpdate.maxPlaces()) {
-            throw new IllegalArgumentException("Registration count is more than max places");
-        }
-
-        Optional.ofNullable(eventToUpdate.date()).ifPresent(event::setDateStart);
-        Optional.ofNullable(eventToUpdate.name()).ifPresent(event::setName);
-        Optional.ofNullable(eventToUpdate.locationId()).ifPresent(event::setLocationId);
-        Optional.ofNullable(eventToUpdate.maxPlaces()).ifPresent(event::setMaxPlaces);
-        Optional.ofNullable(eventToUpdate.cost()).ifPresent(event::setCost);
-        Optional.ofNullable(eventToUpdate.duration()).ifPresent(event::setDuration);
-        Optional.ofNullable(eventToUpdate.date().plusMinutes(eventToUpdate.duration())).ifPresent(event::setDateEnd);
+        checkEventValidation(event, eventToUpdate);
+        event.builder()
+                .dateStart(eventToUpdate.date())
+                .name(event.getName())
+                .location(universalLocationMapper.domainToEntity(locationService.getLocationById(eventToUpdate.locationId())))
+                .maxPlaces(eventToUpdate.maxPlaces())
+                .cost(eventToUpdate.cost())
+                .duration(eventToUpdate.duration())
+                .dateEnd(eventToUpdate.date().plusMinutes(eventToUpdate.duration()))
+                .build();
 
         eventRepository.save(event);
-        kafkaSender.sendMessageToKafka(oldEventToKafka, eventToUpdate, event.getStatus());
-        return universalEventMapper.entityToDomain(event);
+
+        return universalEventMapper.domainToDto(universalEventMapper.entityToDomain(event));
     }
 
-    public List<EventDomain> getUserEvents() {
+    @Transactional
+    public List<EventDto> getUserEvents() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         return eventRepository.findAllUserEvents(currentUser.getId()).stream()
                 .map(universalEventMapper::entityToDomain)
+                .map(universalEventMapper::domainToDto)
                 .toList();
     }
 
-    public List<EventDomain> searchByFilter(EventSearchFilter searchFilter) {
+    @Transactional(readOnly = true)
+    public List<EventDto> searchByFilter(EventSearchFilter searchFilter) {
         var foundEntities = eventRepository.findEvents(
                 searchFilter.name(),
                 searchFilter.placesMin(),
@@ -143,16 +123,58 @@ public class EventService {
                 searchFilter.durationMax(),
                 searchFilter.locationId(),
                 searchFilter.eventStatus()
-        );
+        ).stream().map(universalEventMapper::entityToDomain).toList();
         return foundEntities.stream()
-                .map(universalEventMapper::entityToDomain)
+                .map(universalEventMapper::domainToDto)
                 .toList();
+    }
+
+    private EventDto buildNewEventDto(EventEntity eventEntity) {
+        return EventDto.builder()
+                .occupiedPlaces(0)
+                .date(eventEntity.getDateStart())
+                .duration(eventEntity.getDuration())
+                .cost(eventEntity.getCost())
+                .maxPlaces(eventEntity.getMaxPlaces())
+                .locationId(eventEntity.getLocation().getId())
+                .name(eventEntity.getName())
+                .id(eventEntity.getId())
+                .ownerId(eventEntity.getId())
+                .status(eventEntity.getStatus())
+                .build();
+    }
+
+    private void checkEventValidation(EventEntity eventEntity, UpdateEvent updateEvent) {
+        if (!eventEntity.getStatus().equals(EventStatus.WAITING)) {
+            throw new IllegalArgumentException("Cannot update event in status: %s".formatted(eventEntity.getStatus()));
+        }
+        if (updateEvent.maxPlaces() != null || updateEvent.locationId() != null) {
+            checkCapacityOfLocation(updateEvent.locationId(), updateEvent.maxPlaces());
+        }
+
+        if (updateEvent.maxPlaces() != null && eventEntity.getRegistrations().size() > updateEvent.maxPlaces()) {
+            throw new IllegalArgumentException("Registration count is more than max places");
+        }
+    }
+
+    private EventEntity buildNewEventEntity(RequestEvent eventToCreate, User user, Location location) {
+        return EventEntity.builder()
+                .location(universalLocationMapper.domainToEntity(location))
+                .name(eventToCreate.name())
+                .status(EventStatus.WAITING)
+                .owner(universalUserMapper.domainToEntity(user))
+                .maxPlaces(eventToCreate.maxPlaces())
+                .cost(eventToCreate.cost())
+                .duration(eventToCreate.duration())
+                .dateStart(eventToCreate.date())
+                .dateEnd(eventToCreate.date().plusMinutes(eventToCreate.duration()))
+                .build();
     }
 
     private void checkCurrentUserCanModifyEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        if (!event.getOwnerId().equals(currentUser.getId()) && !currentUser.getRole().equals(Roles.ADMIN)) {
+        if (!event.getOwner().getId().equals(currentUser.getId()) && !currentUser.getRole().equals(Roles.ADMIN)) {
             throw new IllegalArgumentException("This user cannot modify this event");
         }
     }
@@ -166,7 +188,7 @@ public class EventService {
 
     private void checkAvailableLocationDate(UpdateEvent event) {
         var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
-        if(events.size() == 1){
+        if (events.size() == 1) {
             return;
         }
         if (!events.isEmpty()) {

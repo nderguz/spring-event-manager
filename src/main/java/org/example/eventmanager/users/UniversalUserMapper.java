@@ -23,7 +23,7 @@ public class UniversalUserMapper {
                 userDomain.getLogin(),
                 userDomain.getPasswordHash(),
                 userDomain.getAge(),
-                userDomain.getRole().name()
+                userDomain.getRole()
         );
     }
 
@@ -33,7 +33,7 @@ public class UniversalUserMapper {
                 userEntity.getLogin(),
                 userEntity.getPasswordHash(),
                 userEntity.getAge(),
-                Roles.valueOf(userEntity.getRole())
+                userEntity.getRole()
         );
     }
 }

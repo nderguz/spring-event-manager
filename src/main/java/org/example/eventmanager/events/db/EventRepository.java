@@ -14,31 +14,29 @@ import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
-    @Transactional
     @Query("SELECT e FROM EventEntity e WHERE e.status = :status")
     List<EventEntity> findAllByStatus(@Param("status") EventStatus status);
 
-    @Query("SELECT e FROM EventEntity e WHERE e.ownerId = :user_id")
+    @Query("SELECT e FROM EventEntity e WHERE e.owner.id = :user_id")
     List<EventEntity> findAllUserEvents(@Param("user_id") Long userId);
 
     @Modifying
-    @Transactional
     @Query("UPDATE EventEntity e SET e.status = :status where e.id = :id")
     void changeEventStatus(
             @Param("id") Long eventId,
             @Param("status") EventStatus eventStatus
     );
 
-    @Transactional
+
     @Query("SELECT e.registrations FROM EventEntity e JOIN e.registrations r WHERE e.id = :eventId AND r.registrationStatus = 0")
     List <RegistrationEntity> getEventOpenedRegistrations(
             @Param("eventId") Long eventId
     );
 
-    @Transactional
+
     @Query("""
-            SELECT e FROM EventEntity e 
-            WHERE (e.locationId = :location_id) 
+            SELECT e FROM EventEntity e
+            WHERE (e.location.Id = :location_id)
             AND (e.dateStart < :date_end)
             AND (e.dateEnd > :date_start)
             """)
@@ -48,19 +46,19 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("location_id") Long locationId
         );
 
-    @Transactional
+
     @Query("""
-            SELECT e FROM EventEntity e 
-            WHERE (:name IS NULL OR e.name LIKE %:name%) 
-            AND (:placesMin IS NULL OR e.maxPlaces >= :placesMin) 
-            AND (:placesMax IS NULL OR e.maxPlaces <= :placesMax) 
-            AND (CAST(:dateStartAfter as date) IS NULL OR e.dateStart >= :dateStartAfter) 
-            AND (CAST(:dateStartBefore as date) IS NULL OR e.dateStart <= :dateStartBefore) 
-            AND (:costMin IS NULL OR e.cost >= :costMin) 
-            AND (:costMax IS NULL OR e.cost <= :costMax) 
-            AND (:durationMin IS NULL OR e.duration >= :durationMin) 
-            AND (:durationMax IS NULL OR e.duration <= :durationMax) 
-            AND (:locationId IS NULL OR e.locationId = :locationId) 
+            SELECT e FROM EventEntity e
+            WHERE (:name IS NULL OR e.name LIKE %:name%)
+            AND (:placesMin IS NULL OR e.maxPlaces >= :placesMin)
+            AND (:placesMax IS NULL OR e.maxPlaces <= :placesMax)
+            AND (CAST(:dateStartAfter as date) IS NULL OR e.dateStart >= :dateStartAfter)
+            AND (CAST(:dateStartBefore as date) IS NULL OR e.dateStart <= :dateStartBefore)
+            AND (:costMin IS NULL OR e.cost >= :costMin)
+            AND (:costMax IS NULL OR e.cost <= :costMax)
+            AND (:durationMin IS NULL OR e.duration >= :durationMin)
+            AND (:durationMax IS NULL OR e.duration <= :durationMax)
+            AND (:locationId IS NULL OR e.location.Id = :locationId)
             AND (:eventStatus IS NULL OR e.status = :eventStatus)
             """)
     List<EventEntity> findEvents(

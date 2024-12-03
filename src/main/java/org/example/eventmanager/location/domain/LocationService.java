@@ -2,6 +2,7 @@ package org.example.eventmanager.location.domain;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.example.eventmanager.location.db.LocationEntity;
 import org.example.eventmanager.location.db.LocationRepository;
 import org.example.eventmanager.location.UniversalLocationMapper;
 import org.springframework.stereotype.Service;
@@ -40,17 +41,19 @@ public class LocationService {
                 .formatted(locationId)));
         return universalLocationMapper.entityToDomain(foundEntityById);
     }
+
     public Location updateLocation(Long locationId,Location locationToUpdate) {
         if (locationToUpdate.Id() != null) {
             throw new IllegalArgumentException("Can not update location with provided ID.");
         }
-        var entityToUpdate = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("Location not found. ID = %s"
-                .formatted(locationId)));
-        entityToUpdate.setAddress(locationToUpdate.address());
-        entityToUpdate.setName(locationToUpdate.name());
-        entityToUpdate.setCapacity(locationToUpdate.capacity());
-        entityToUpdate.setDescription(locationToUpdate.description());
-
+        var entityToUpdate = LocationEntity
+                .builder()
+                    .Id(locationId)
+                    .address(locationToUpdate.address())
+                    .name(locationToUpdate.name())
+                    .capacity(locationToUpdate.capacity())
+                    .description(locationToUpdate.description())
+                .build();
         var updatedLocation = locationRepository.save(entityToUpdate);
         return universalLocationMapper.entityToDomain(updatedLocation);
     }

@@ -1,10 +1,13 @@
 package org.example.eventmanager.events.domain;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public record EventDomain (
+@Builder
+public record EventDomain(
         List<Registration> occupiedPlaces,
         ZonedDateTime date,
         Integer duration,
@@ -15,5 +18,5 @@ public record EventDomain (
         Long id,
         Long ownerId,
         EventStatus status
-){
+) {
 }

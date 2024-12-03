@@ -12,20 +12,19 @@ import lombok.*;
 @Entity
 @Table(name = "locations")
 public class LocationEntity {
+
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    @Column(name = "location_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long Id;
 
-    @Column(name = "location_name",
+    @Column(name = "name",
             nullable = false
     )
     private String name;
 
     @Column(nullable = false,
-            name = "location_adress")
+            name = "address")
     private String address;
 
     @Column(name = "capacity")
@@ -33,5 +32,4 @@ public class LocationEntity {
 
     @Column(name = "description")
     private String description;
-
 }

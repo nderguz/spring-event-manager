@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -103,7 +104,7 @@ class LocationServiceTest {
     }
 
     @Test
-    public void testCreateLocationWithId() {
+    public void testCreateLocationWithProvidedId() {
         Location newLocation = new Location(
                 1L,
                 "New Location",
@@ -123,11 +124,13 @@ class LocationServiceTest {
     @Test
     public void testDeleteLocation() {
         when(locationRepository.findById(1L)).thenReturn(Optional.of(locationEntity));
+        when(locationService.deleteLocation(1L)).thenReturn(location);
 
         Location deletedLocation = locationService.deleteLocation(1L);
 
         assertNotNull(deletedLocation);
         assertEquals(1L, deletedLocation.Id());
+
         verify(locationRepository, times(1)).findById(1L);
         verify(locationRepository, times(1)).deleteById(1L);
     }

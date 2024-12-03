@@ -25,7 +25,7 @@ public class EventRegistrationService {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         checkCapacityOfEvent(event.getId());
-        if(event.getOwnerId().equals(currentUser.getId())){
+        if(event.getOwner().getId().equals(currentUser.getId())){
             throw new IllegalArgumentException("Owner cannot register to the event");
         }
         if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.CANCELLED)) {

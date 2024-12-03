@@ -37,7 +37,5 @@ public class AuthenticationService {
             throw new IllegalStateException("Authentication not present");
         }
         return (User) authentication.getPrincipal();
-//        var userName = authentication.getName();
-//        return userService.getUserByLogin(userName);
     }
 }

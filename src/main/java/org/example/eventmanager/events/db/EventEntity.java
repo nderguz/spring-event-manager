@@ -4,6 +4,11 @@ package org.example.eventmanager.events.db;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.eventmanager.events.domain.EventStatus;
+import org.example.eventmanager.location.db.LocationEntity;
+import org.example.eventmanager.users.db.UserEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -11,8 +16,6 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
 @Data
 @Table(name = "events")
@@ -23,17 +26,20 @@ public class EventEntity {
     @Column(name = "event_id")
     private Long id;
 
-    @Column(name = "location_id", nullable = false)
-    private Long locationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private LocationEntity location;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EventStatus status;
 
-    @Column(name = "user_id")
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id")
+    private UserEntity owner;
 
     @Column(name = "max_places", nullable = false)
     private Long maxPlaces;
@@ -50,7 +56,8 @@ public class EventEntity {
     @Column(name = "date_end", nullable = false)
     private ZonedDateTime dateEnd;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RegistrationEntity> registrations;
 
 }

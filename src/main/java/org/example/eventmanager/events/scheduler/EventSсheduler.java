@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
 import org.example.eventmanager.events.db.EventEntity;
-import org.example.eventmanager.events.domain.EventStatus;
 import org.example.eventmanager.events.db.EventRepository;
-import org.example.eventmanager.kafka.KafkaSender;
+import org.example.eventmanager.events.domain.EventStatus;
 import org.example.eventmanager.users.db.UserRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +19,6 @@ import java.util.Objects;
 public class EventSсheduler implements EventSchedulerService {
 
     private final EventRepository eventRepository;
-    private final KafkaSender kafkaSender;
     private final UserRepository userRepository;
     private final UniversalEventMapper universalEventMapper;
 
@@ -34,15 +33,12 @@ public class EventSсheduler implements EventSchedulerService {
                     var eventToKafka = universalEventMapper.entityToDomain(event);
                     event.setStatus(EventStatus.STARTED);
                     eventRepository.save(event);
-                    kafkaSender.sendMessageToKafka(eventToKafka, EventStatus.STARTED);
                 }
-            }
-            else if (Objects.equals(event.getStatus(), EventStatus.STARTED)) {
+            } else if (Objects.equals(event.getStatus(), EventStatus.STARTED)) {
                 if (dateTime.isAfter(event.getDateEnd())) {
                     var eventToKafka = universalEventMapper.entityToDomain(event);
                     event.setStatus(EventStatus.FINISHED);
                     eventRepository.save(event);
-                    kafkaSender.sendMessageToKafka(eventToKafka, EventStatus.FINISHED);
                 }
             }
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.eventmanager.security.entities.Roles;
 
 @Entity
 @AllArgsConstructor
@@ -29,7 +30,6 @@ public class UserEntity {
     private Integer age;
 
     @Column(name = "role", nullable = false)
-    private String role;
-
-
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 }
