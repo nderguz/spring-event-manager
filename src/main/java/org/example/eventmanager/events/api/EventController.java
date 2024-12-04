@@ -18,7 +18,6 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
-    private final KafkaSender kafkaSender;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(

@@ -10,7 +10,11 @@ public class KafkaTopic {
 
     @Bean
     public NewTopic topic1() {
-        return TopicBuilder.name("topic1").build();
+        return TopicBuilder.name("eventStatus").build();
     }
 
+    @Bean
+    public NewTopic topic2() {
+        return TopicBuilder.name("eventChanges").build();
+    }
 }

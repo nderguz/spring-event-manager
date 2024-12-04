@@ -1,6 +1,8 @@
 package org.example.eventmanager.events.db;
 
 import org.example.eventmanager.events.domain.EventStatus;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
