@@ -1,13 +1,12 @@
 package org.example.eventmanager.events.db;
 
-import jakarta.transaction.Transactional;
 import org.example.eventmanager.events.domain.EventStatus;
-import org.example.eventmanager.users.db.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -28,8 +27,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     );
 
 
-    @Query("SELECT e.registrations FROM EventEntity e JOIN e.registrations r WHERE e.id = :eventId AND r.registrationStatus = 0")
-    List <RegistrationEntity> getEventOpenedRegistrations(
+    @Query("SELECT e.registrations FROM EventEntity e JOIN e.registrations r WHERE e.id = :eventId AND r.registrationStatus = \"OPENED\"")
+    List<RegistrationEntity> getEventOpenedRegistrations(
             @Param("eventId") Long eventId
     );
 
@@ -44,7 +43,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("date_start") ZonedDateTime start,
             @Param("date_end") ZonedDateTime end,
             @Param("location_id") Long locationId
-        );
+    );
 
 
     @Query("""

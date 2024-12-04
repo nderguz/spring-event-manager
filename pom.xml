@@ -52,6 +52,13 @@
 			<version>2.3.232</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.6.3.Final</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.postgresql</groupId>

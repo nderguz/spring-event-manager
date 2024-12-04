@@ -1,6 +1,7 @@
 package org.example.eventmanager.events.scheduler;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
 import org.example.eventmanager.events.db.EventEntity;
@@ -13,13 +14,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class EventSсheduler implements EventSchedulerService {
 
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
     private final UniversalEventMapper universalEventMapper;
 
     @Override

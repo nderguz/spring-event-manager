@@ -28,7 +28,7 @@ public interface RegistrationRepository extends CrudRepository<RegistrationEntit
 
     @Modifying
     @Transactional
-    @Query("UPDATE RegistrationEntity SET registrationStatus = 1 WHERE userId = :user_id AND event = :event")
+    @Query("UPDATE RegistrationEntity SET registrationStatus = \"CLOSED\" WHERE userId = :user_id AND event = :event")
     void closeRegistration(
             @Param("user_id") Long userId,
             @Param("event") EventEntity event
@@ -36,7 +36,7 @@ public interface RegistrationRepository extends CrudRepository<RegistrationEntit
 
     @Modifying
     @Transactional
-    @Query("UPDATE RegistrationEntity SET registrationStatus = 1 WHERE event = :event")
+    @Query("UPDATE RegistrationEntity SET registrationStatus = \"CLOSED\" WHERE event = :event")
     void closeAllRegistrations(
             @Param("event") EventEntity event
     );

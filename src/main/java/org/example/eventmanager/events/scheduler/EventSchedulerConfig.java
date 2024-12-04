@@ -14,12 +14,12 @@ import java.text.ParseException;
 public class EventSchedulerConfig {
     private final EventSchedulerService eventSchedulerService;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 * * * * *")
     public void scheduleCheckWaitingEvents() throws ParseException {
         eventSchedulerService.scheduleCheckEventStatus(EventStatus.WAITING);
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 * * * * *")
     public void scheduleCheckStartedEvents() throws ParseException {
         eventSchedulerService.scheduleCheckEventStatus(EventStatus.STARTED);
     }
