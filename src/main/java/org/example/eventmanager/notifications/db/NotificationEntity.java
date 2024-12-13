@@ -9,6 +9,7 @@ import org.example.eventmanager.events.db.EventEntity;
 import org.example.eventmanager.notifications.NotificationStatus;
 import org.example.eventmanager.users.db.UserEntity;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -37,5 +38,5 @@ public class NotificationEntity {
     private NotificationStatus status;
 
     @Column(name = "date")
-    private ZonedDateTime date;
+    private LocalDateTime date;
 }

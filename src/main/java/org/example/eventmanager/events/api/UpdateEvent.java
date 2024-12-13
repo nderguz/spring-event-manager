@@ -4,6 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public record UpdateEvent (
@@ -11,7 +12,7 @@ public record UpdateEvent (
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @Future(message = "Date must be in future")
         @NotNull
-        ZonedDateTime date,
+        LocalDateTime date,
 
         @Min(value = 30, message = "Duration must be greater than 30")
         @NotNull

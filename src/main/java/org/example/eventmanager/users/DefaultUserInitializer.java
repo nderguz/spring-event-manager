@@ -30,13 +30,12 @@ public class DefaultUserInitializer {
             return;
         }
         var hashedPass = passwordEncoder.encode(password);
-        var user = new User(
-                null,
-                login,
-                hashedPass,
-                21,
-                role
-        );
+        var user = User.builder()
+                .login(login)
+                .passwordHash(hashedPass)
+                .age(21)
+                .role(role)
+                .build();
         userService.saveUser(user);
     }
 }

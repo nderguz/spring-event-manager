@@ -4,12 +4,12 @@ import lombok.Builder;
 import org.example.eventmanager.events.domain.EventStatus;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Builder
 public record EventDto(
         Integer occupiedPlaces,
-        ZonedDateTime date,
+        LocalDateTime date,
         Integer duration,
         BigDecimal cost,
         Long maxPlaces,

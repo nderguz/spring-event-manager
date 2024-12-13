@@ -16,11 +16,11 @@ import org.example.eventmanager.security.entities.Roles;
 public class UserEntity {
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_login", unique = true)
+    @Column(name = "login", unique = true)
     private String login;
 
     @Column(name = "password_hash")

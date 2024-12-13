@@ -20,13 +20,12 @@ public class UserRegistrationService {
             throw new IllegalArgumentException("User with such login already exists");
         }
         var hashedPass = passwordEncoder.encode(signUpRequest.password());
-        var user = new User(
-                null,
-                signUpRequest.login(),
-                hashedPass,
-                signUpRequest.age(),
-                Roles.USER
-        );
+        var user = User.builder()
+                .login(signUpRequest.login())
+                .passwordHash(hashedPass)
+                .age(signUpRequest.age())
+                .role(Roles.USER)
+                .build();
         return userService.saveUser(user);
     }
 }

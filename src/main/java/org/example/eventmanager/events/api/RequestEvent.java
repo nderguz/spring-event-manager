@@ -5,13 +5,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public record RequestEvent (
 
         @NotNull
         @Future(message = "Event must be at future")
-        ZonedDateTime date,
+        LocalDateTime date,
 
         @NotNull
         @Positive(message = "Duration cannot be negative number")

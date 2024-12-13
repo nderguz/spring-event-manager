@@ -8,6 +8,7 @@ import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.domain.EventStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class EventSсheduler implements EventSchedulerService {
     //Отправка нотификации о начале мероприятия
     @Override
     public void scheduleCheckEventStatus(EventStatus eventStatus) {
-        ZonedDateTime dateTime = ZonedDateTime.now();
+        LocalDateTime dateTime = LocalDateTime.now();
         List<EventEntity> events = eventRepository.findAllByStatus(eventStatus);
         for (EventEntity event : events) {
             var date = event.getDateStart();

@@ -16,6 +16,7 @@ public class RegistrationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long registrationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
