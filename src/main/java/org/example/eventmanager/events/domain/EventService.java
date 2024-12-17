@@ -18,13 +18,11 @@ import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.example.eventmanager.users.UniversalUserMapper;
 import org.example.eventmanager.users.domain.User;
-import org.example.eventmanager.users.domain.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +94,6 @@ public class EventService {
                 .build();
 
         eventRepository.save(event);
-
         return universalEventMapper.domainToDto(universalEventMapper.entityToDomain(event));
     }
 

@@ -4,26 +4,27 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.domain.EventService;
-import org.example.eventmanager.kafka.KafkaSender;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/events")
-@RequiredArgsConstructor
 @Slf4j
+@RestController
+@RequestMapping(value = "/events",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
+@RequiredArgsConstructor
 public class EventController {
 
     private final EventService eventService;
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
-            @RequestBody
-            @Valid
-            RequestEvent eventToCreate
+            @RequestBody @Valid RequestEvent eventToCreate
     ) {
         var createdEvent = eventService.createEvent(eventToCreate);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);

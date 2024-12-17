@@ -9,12 +9,12 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopic {
 
     @Bean
-    public NewTopic topic1() {
-        return TopicBuilder.name("eventStatus").build();
+    public NewTopic closedEventTopic() {
+        return TopicBuilder.name("deletedEvents").build();
     }
 
     @Bean
-    public NewTopic topic2() {
-        return TopicBuilder.name("eventChanges").build();
+    public NewTopic changedEvents() {
+        return TopicBuilder.name("changedEvents").build();
     }
 }

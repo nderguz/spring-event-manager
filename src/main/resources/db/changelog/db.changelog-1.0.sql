@@ -47,14 +47,3 @@ create table if not exists registrations
     status varchar(25) not null
 );
 --rollback DROP TABLE registrations;
-
---changeset nderguz:5
-create table if not exists notifications
-(
-    id bigserial primary key,
-    event_id bigint references events,
-    user_id bigint references users,
-    status varchar(25) not null,
-    date timestamp(0)
-);
---rollback DROP TABLE notifications;
