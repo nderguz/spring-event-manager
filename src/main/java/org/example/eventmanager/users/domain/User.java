@@ -1,15 +1,11 @@
 package org.example.eventmanager.users.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.eventmanager.security.entities.Roles;
 
 @AllArgsConstructor
-@Getter
-@Setter
 @Builder
+@Data
 public class User{
     private Long id;
     private String login;

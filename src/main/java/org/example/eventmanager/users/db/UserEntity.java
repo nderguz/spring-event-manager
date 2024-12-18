@@ -1,17 +1,14 @@
 package org.example.eventmanager.users.db;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.eventmanager.security.entities.Roles;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
 @Table(name = "users")
 public class UserEntity {
 
