@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import org.example.eventmanager.events.domain.EventStatus;
 import org.example.eventmanager.location.db.LocationEntity;
 import org.example.eventmanager.users.db.UserEntity;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,24 +1,31 @@
 version: '3.8'
 
 services:
+  event-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 'event-manager:latest'
+    container_name: event-manager
+    ports:
+      - "9595:9595"
+#    volumes:
+#      - .:/app
+#    working_dir: /app
+#    command: ["./mvnw", "spring-boot:run"]
+    depends_on:
+      - postgres
 
-#  event-notificator:
-#    build:
-#      context: ../event-notificator
-#    ports:
-#       - "8090:8090"
-#    depends_on:
-#      - kafka
 
-#  postgres:
-#    image: postgres:15
-#    container_name: postgres
-#    environment:
-#      POSTGRES_DB: postgres
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: root
-#    ports:
-#      - "5432:5432"
+  postgres:
+    image: 'postgres:latest'
+    container_name: 'postgres'
+    environment:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
 #    volumes:
 #      - postgres_data:/var/lib/postgresql/data
 
@@ -45,32 +52,32 @@ services:
 #      ZOOKEEPER_CLIENT_PORT: 2181
 #      ZOOKEEPER_TICK_TIME: 2000
 
-  app:
-    image: openjdk:22-jdk-slim
-    container_name: event-manager
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
-      SERVER_PORT: 8080
-      SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: UTC
-      SPRINGDOC_SWAGGER_UI_URL: /event-manager-openapi.yaml
-      JWT_SIGN_KEY: faf9182f-ff9c-4451-822f-5524491d548b
-      JWT_LIFETIME: 1800000
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
-      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
-    volumes:
-      - .:/app
-    working_dir: /app
-    command: ["./mvnw", "spring-boot:run"]
-    depends_on:
-      - postgres
-      - kafka
-
-volumes:
-  postgres_data:
+#  app:
+#    image: openjdk:22-jdk-slim
+#    container_name: event-manager
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: root
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#      SPRING_JPA_SHOW_SQL: "true"
+#      SERVER_PORT: 8080
+#      SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: UTC
+#      SPRINGDOC_SWAGGER_UI_URL: /event-manager-openapi.yaml
+#      JWT_SIGN_KEY: faf9182f-ff9c-4451-822f-5524491d548b
+#      JWT_LIFETIME: 1800000
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
+#      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
+#    volumes:
+#      - .:/app
+#    working_dir: /app
+#    command: ["./mvnw", "spring-boot:run"]
+#    depends_on:
+#      - postgres
+#      - kafka
+#
+#volumes:
+#  postgres_data:
