@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
 )
-@CrossOrigin(origins = "*", allowCredentials = "false")
 @Slf4j
 public class UserController {
 

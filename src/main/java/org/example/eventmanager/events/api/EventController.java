@@ -17,7 +17,6 @@ import java.util.List;
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
 )
-@CrossOrigin(origins = "*", allowCredentials = "false")
 @RequiredArgsConstructor
 public class EventController {
 
