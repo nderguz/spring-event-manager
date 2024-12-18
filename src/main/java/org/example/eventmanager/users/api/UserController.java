@@ -10,12 +10,17 @@ import org.example.eventmanager.security.entities.SignInRequest;
 import org.example.eventmanager.security.entities.SignUpRequest;
 import org.example.eventmanager.users.UniversalUserMapper;
 import org.example.eventmanager.users.domain.UserService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(value = "/users",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
+@CrossOrigin(origins = "*", allowCredentials = "false")
 @Slf4j
 public class UserController {
 
