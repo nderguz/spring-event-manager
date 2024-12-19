@@ -4,13 +4,14 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
-import org.example.eventmanager.events.api.EventDto;
-import org.example.eventmanager.events.api.EventSearchFilter;
-import org.example.eventmanager.events.api.RequestEvent;
-import org.example.eventmanager.events.api.UpdateEvent;
-import org.example.eventmanager.events.db.EventEntity;
+import org.example.eventmanager.events.api.model.EventFullInfo;
+import org.example.eventmanager.events.api.model.EventSearchFilter;
+import org.example.eventmanager.events.api.model.EventRequestToCreate;
+import org.example.eventmanager.events.api.model.EventUpdateRequest;
+import org.example.eventmanager.events.db.model.EventEntity;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
+import org.example.eventmanager.events.domain.model.EventStatus;
 import org.example.eventmanager.location.UniversalLocationMapper;
 import org.example.eventmanager.location.domain.Location;
 import org.example.eventmanager.location.domain.LocationService;
@@ -38,7 +39,7 @@ public class EventService {
     private final UniversalUserMapper universalUserMapper;
 
     @Transactional
-    public EventDto createEvent(RequestEvent eventToCreate) {
+    public EventFullInfo createEvent(EventRequestToCreate eventToCreate) {
         checkAvailableLocationDate(eventToCreate);
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var locationInfo = locationService.getLocationById(eventToCreate.locationId());
@@ -50,12 +51,11 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventDto getEventById(Long eventId) {
+    public EventFullInfo getEventById(Long eventId) {
         var foundEvent = universalEventMapper.entityToDomain(eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found by id: %s".formatted(eventId))));
         return universalEventMapper.domainToDto(foundEvent);
     }
-
 
     @Transactional
     public void deleteEvent(Long eventId) {
@@ -77,28 +77,26 @@ public class EventService {
     }
 
     @Transactional
-    public EventDto updateEvent(Long eventId, UpdateEvent eventToUpdate) {
-        checkCurrentUserCanModifyEvent(eventId);
+    public EventFullInfo updateEvent(Long eventId, EventUpdateRequest eventToUpdate) {
         checkAvailableLocationDate(eventToUpdate);
-        var event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
-        checkEventValidation(event, eventToUpdate);
-        event.builder()
+        var oldEvent = checkCurrentUserCanModifyEvent(eventId);
+        checkEventValidation(oldEvent, eventToUpdate);
+        var event = EventEntity.builder()
                 .dateStart(eventToUpdate.date())
-                .name(event.getName())
+                .name(eventToUpdate.name())
                 .location(universalLocationMapper.domainToEntity(locationService.getLocationById(eventToUpdate.locationId())))
                 .maxPlaces(eventToUpdate.maxPlaces())
                 .cost(eventToUpdate.cost())
                 .duration(eventToUpdate.duration())
                 .dateEnd(eventToUpdate.date().plusMinutes(eventToUpdate.duration()))
+                .status(oldEvent.getStatus())
                 .build();
-
         eventRepository.save(event);
         return universalEventMapper.domainToDto(universalEventMapper.entityToDomain(event));
     }
 
     @Transactional
-    public List<EventDto> getUserEvents() {
+    public List<EventFullInfo> getUserEvents() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         return eventRepository.findAllUserEvents(currentUser.getId()).stream()
                 .map(universalEventMapper::entityToDomain)
@@ -107,7 +105,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventDto> searchByFilter(EventSearchFilter searchFilter) {
+    public List<EventFullInfo> searchByFilter(EventSearchFilter searchFilter) {
         var foundEntities = eventRepository.findEvents(
                 searchFilter.name(),
                 searchFilter.placesMin(),
@@ -126,8 +124,8 @@ public class EventService {
                 .toList();
     }
 
-    private EventDto buildNewEventDto(EventEntity eventEntity) {
-        return EventDto.builder()
+    private EventFullInfo buildNewEventDto(EventEntity eventEntity) {
+        return EventFullInfo.builder()
                 .occupiedPlaces(0)
                 .date(eventEntity.getDateStart())
                 .duration(eventEntity.getDuration())
@@ -141,7 +139,7 @@ public class EventService {
                 .build();
     }
 
-    private void checkEventValidation(EventEntity eventEntity, UpdateEvent updateEvent) {
+    private void checkEventValidation(EventEntity eventEntity, EventUpdateRequest updateEvent) {
         if (!eventEntity.getStatus().equals(EventStatus.WAITING)) {
             throw new IllegalArgumentException("Cannot update event in status: %s".formatted(eventEntity.getStatus()));
         }
@@ -154,7 +152,7 @@ public class EventService {
         }
     }
 
-    private EventEntity buildNewEventEntity(RequestEvent eventToCreate, User user, Location location) {
+    private EventEntity buildNewEventEntity(EventRequestToCreate eventToCreate, User user, Location location) {
         return EventEntity.builder()
                 .location(universalLocationMapper.domainToEntity(location))
                 .name(eventToCreate.name())
@@ -168,22 +166,24 @@ public class EventService {
                 .build();
     }
 
-    private void checkCurrentUserCanModifyEvent(Long eventId) {
+    private EventEntity checkCurrentUserCanModifyEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
         if (!event.getOwner().getId().equals(currentUser.getId()) && !currentUser.getRole().equals(Roles.ADMIN)) {
             throw new IllegalArgumentException("This user cannot modify this event");
         }
+        return event;
     }
 
-    private void checkAvailableLocationDate(RequestEvent event) {
+    private void checkAvailableLocationDate(EventRequestToCreate event) {
         var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
         if (!events.isEmpty()) {
             throw new IllegalArgumentException("Location already reserved at this date");
         }
     }
 
-    private void checkAvailableLocationDate(UpdateEvent event) {
+    private void checkAvailableLocationDate(EventUpdateRequest event) {
         var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
         if (events.size() == 1) {
             return;

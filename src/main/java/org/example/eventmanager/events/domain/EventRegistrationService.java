@@ -1,13 +1,14 @@
 package org.example.eventmanager.events.domain;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
-import org.example.eventmanager.events.api.EventDto;
-import org.example.eventmanager.events.db.RegistrationEntity;
+import org.example.eventmanager.events.api.model.EventFullInfo;
+import org.example.eventmanager.events.db.model.RegistrationEntity;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
+import org.example.eventmanager.events.domain.model.EventStatus;
+import org.example.eventmanager.events.domain.model.RegistrationStatus;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -60,7 +61,7 @@ public class EventRegistrationService {
         registrationRepository.closeRegistration(currentUser.getId(), event);
     }
 
-    public List<EventDto> getUserRegistrations() {
+    public List<EventFullInfo> getUserRegistrations() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var foundEvents = registrationRepository.findUserEvents(currentUser.getId()).stream()
                 .map(universalEventMapper::entityToDomain).toList();

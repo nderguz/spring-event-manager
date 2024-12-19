@@ -7,8 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.users.domain.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +22,6 @@ import java.util.List;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-
     private final JwtTokenManager jwtTokenManager;
     private final UserService userService;
 
@@ -36,13 +33,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorization == null || !authorization.startsWith("Bearer ")){
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
         var jwtToken = authorization.substring(7);
 
-        if(!jwtTokenManager.isTokenValid(jwtToken)){
+        if (!jwtTokenManager.isTokenValid(jwtToken)) {
             log.info("Invalid JWT token");
             filterChain.doFilter(request, response);
             return;

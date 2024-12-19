@@ -1,14 +1,14 @@
-package org.example.eventmanager.events.api;
+package org.example.eventmanager.events.api.model;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
-public record RequestEvent (
+public record EventRequestToCreate(
 
         @NotNull
         @Future(message = "Event must be at future")
@@ -30,5 +30,5 @@ public record RequestEvent (
 
         @NotNull(message = "Event name cannot be empty")
         String name
-){
+) {
 }

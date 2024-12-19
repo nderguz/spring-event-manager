@@ -1,20 +1,18 @@
 package org.example.eventmanager.events;
 
-import org.example.eventmanager.events.api.EventDto;
-import org.example.eventmanager.events.api.RequestEvent;
-import org.example.eventmanager.events.db.EventEntity;
-import org.example.eventmanager.events.domain.EventDomain;
-import org.example.eventmanager.events.domain.Registration;
+import org.example.eventmanager.events.api.model.EventFullInfo;
+import org.example.eventmanager.events.db.model.EventEntity;
+import org.example.eventmanager.events.domain.model.EventDomain;
+import org.example.eventmanager.events.domain.model.Registration;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class UniversalEventMapper {
 
-    public EventDto domainToDto(EventDomain entity) {
-        return new EventDto(
+    public EventFullInfo domainToDto(EventDomain entity) {
+        return new EventFullInfo(
                 entity.occupiedPlaces().size(),
                 entity.date(),
                 entity.duration(),

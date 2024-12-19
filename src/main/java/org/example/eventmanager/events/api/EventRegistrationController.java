@@ -1,8 +1,7 @@
 package org.example.eventmanager.events.api;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.example.eventmanager.events.UniversalEventMapper;
+import org.example.eventmanager.events.api.model.EventFullInfo;
 import org.example.eventmanager.events.domain.EventRegistrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,7 @@ public class EventRegistrationController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<EventDto>> getMyRegistrations(
+    public ResponseEntity<List<EventFullInfo>> getMyRegistrations(
     ) {
         return ResponseEntity.ok().body(eventRegistrationService.getUserRegistrations());
     }

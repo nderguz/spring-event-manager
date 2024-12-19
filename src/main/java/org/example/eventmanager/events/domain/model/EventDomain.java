@@ -1,10 +1,9 @@
-package org.example.eventmanager.events.domain;
+package org.example.eventmanager.events.domain.model;
 
 import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Builder

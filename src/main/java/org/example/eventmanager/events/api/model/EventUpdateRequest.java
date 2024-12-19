@@ -1,13 +1,12 @@
-package org.example.eventmanager.events.api;
+package org.example.eventmanager.events.api.model;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
-public record UpdateEvent (
+public record EventUpdateRequest(
 
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @Future(message = "Date must be in future")
@@ -27,5 +26,5 @@ public record UpdateEvent (
         Long locationId,
         @NotNull
         String name
-){
+) {
 }

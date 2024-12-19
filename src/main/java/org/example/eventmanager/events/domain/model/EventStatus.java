@@ -1,4 +1,4 @@
-package org.example.eventmanager.events.domain;
+package org.example.eventmanager.events.domain.model;
 
 public enum EventStatus {
 

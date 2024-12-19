@@ -3,13 +3,12 @@ package org.example.eventmanager.events.scheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.events.UniversalEventMapper;
-import org.example.eventmanager.events.db.EventEntity;
+import org.example.eventmanager.events.db.model.EventEntity;
 import org.example.eventmanager.events.db.EventRepository;
-import org.example.eventmanager.events.domain.EventStatus;
+import org.example.eventmanager.events.domain.model.EventStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 

@@ -1,10 +1,9 @@
-package org.example.eventmanager.events.api;
+package org.example.eventmanager.events.api.model;
 
-import org.example.eventmanager.events.domain.EventStatus;
+import org.example.eventmanager.events.domain.model.EventStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 public record EventSearchFilter (
         String name,

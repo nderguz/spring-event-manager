@@ -1,8 +1,8 @@
-package org.example.eventmanager.events.db;
+package org.example.eventmanager.events.db.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.eventmanager.events.domain.RegistrationStatus;
+import org.example.eventmanager.events.domain.model.RegistrationStatus;
 
 @Entity
 @Data

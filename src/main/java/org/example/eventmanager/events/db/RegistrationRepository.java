@@ -1,7 +1,8 @@
 package org.example.eventmanager.events.db;
 
 import jakarta.transaction.Transactional;
-import org.example.eventmanager.users.db.UserEntity;
+import org.example.eventmanager.events.db.model.EventEntity;
+import org.example.eventmanager.events.db.model.RegistrationEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
