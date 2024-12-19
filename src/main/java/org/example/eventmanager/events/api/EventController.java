@@ -13,16 +13,14 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/events",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping(value = "/events")
 @RequiredArgsConstructor
 public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> createEvent(
             @RequestBody @Valid RequestEvent eventToCreate
     ) {
@@ -30,7 +28,7 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
-    @DeleteMapping("/{eventId}")
+    @DeleteMapping(value = "/{eventId}")
     public ResponseEntity<Void> deleteEvent(
             @PathVariable Long eventId
     ) {
@@ -38,14 +36,18 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping(value = "/{eventId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<EventDto> getEventById(
             @PathVariable Long eventId
     ) {
         return ResponseEntity.ok(eventService.getEventById(eventId));
     }
 
-    @PutMapping("/{eventId}")
+    @PutMapping(value ="/{eventId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable Long eventId,
             @RequestBody UpdateEvent eventToUpdate
@@ -53,7 +55,10 @@ public class EventController {
         return ResponseEntity.ok(eventService.updateEvent(eventId, eventToUpdate));
     }
 
-    @PostMapping("/search")
+    @PostMapping(value = "/search",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<List<EventDto>> searchEvents(
             @RequestBody @Valid EventSearchFilter searchFilter
     ) {
@@ -61,7 +66,9 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.searchByFilter(searchFilter));
     }
 
-    @GetMapping("/my")
+    @GetMapping(value = "/my",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<List<EventDto>> getMyEvents() {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.getUserEvents());
     }

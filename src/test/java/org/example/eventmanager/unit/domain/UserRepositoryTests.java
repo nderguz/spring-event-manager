@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.domain;
+package org.example.eventmanager.unit.domain;
 
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.db.UserEntity;

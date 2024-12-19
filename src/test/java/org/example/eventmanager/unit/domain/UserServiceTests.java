@@ -1,9 +1,11 @@
-package org.example.eventmanager.users.domain;
+package org.example.eventmanager.unit.domain;
 
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.UniversalUserMapper;
 import org.example.eventmanager.users.db.UserEntity;
 import org.example.eventmanager.users.db.UserRepository;
+import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
