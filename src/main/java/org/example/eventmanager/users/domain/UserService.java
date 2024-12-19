@@ -1,7 +1,9 @@
 package org.example.eventmanager.users.domain;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.example.eventmanager.users.db.UserRepository;
 import org.example.eventmanager.users.UniversalUserMapper;
@@ -17,7 +19,7 @@ public class UserService {
     private final UniversalUserMapper universalUserMapper;
 
     @Transactional(readOnly = true)
-    public boolean isUserExistsByLogin(String login){
+    public boolean isUserExistsByLogin(@NonNull String login){
         return userRepository.findByLogin(login)
                 .isPresent();
     }
@@ -30,7 +32,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserByLogin(String login) {
+    public User getUserByLogin(@NonNull String login) {
         return userRepository
                 .findByLogin(login)
                 .map(universalUserMapper::entityToDomain)
