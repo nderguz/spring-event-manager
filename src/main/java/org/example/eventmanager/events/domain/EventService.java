@@ -3,14 +3,13 @@ package org.example.eventmanager.events.domain;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.eventmanager.events.UniversalEventMapper;
 import org.example.eventmanager.events.api.model.EventFullInfo;
-import org.example.eventmanager.events.api.model.EventSearchFilter;
 import org.example.eventmanager.events.api.model.EventRequestToCreate;
+import org.example.eventmanager.events.api.model.EventSearchFilter;
 import org.example.eventmanager.events.api.model.EventUpdateRequest;
-import org.example.eventmanager.events.db.model.EventEntity;
 import org.example.eventmanager.events.db.EventRepository;
 import org.example.eventmanager.events.db.RegistrationRepository;
+import org.example.eventmanager.events.db.model.EventEntity;
 import org.example.eventmanager.events.domain.model.EventStatus;
 import org.example.eventmanager.location.UniversalLocationMapper;
 import org.example.eventmanager.location.domain.Location;
@@ -32,7 +31,6 @@ public class EventService {
 
     private final LocationService locationService;
     private final EventRepository eventRepository;
-    private final UniversalEventMapper universalEventMapper;
     private final AuthenticationService authenticationService;
     private final RegistrationRepository registrationRepository;
     private final UniversalLocationMapper universalLocationMapper;
@@ -40,25 +38,25 @@ public class EventService {
 
     @Transactional
     public EventFullInfo createEvent(EventRequestToCreate eventToCreate) {
-        checkAvailableLocationDate(eventToCreate);
+        checkLocationDateAvailability(eventToCreate);
+        var getValidatedLocation = getValidatedLocation(eventToCreate.locationId(), eventToCreate.maxPlaces());
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
-        var locationInfo = locationService.getLocationById(eventToCreate.locationId());
-        if (locationInfo.capacity() < eventToCreate.maxPlaces()) {
-            throw new IllegalArgumentException("Capacity of location is: %s, but maxPlaces is: %s".formatted(locationInfo.capacity(), eventToCreate.maxPlaces()));
-        }
-        var savedEvent = eventRepository.save(buildNewEventEntity(eventToCreate, currentUser, locationInfo));
-        return buildNewEventDto(savedEvent);
+        var savedEvent = eventRepository.save(
+                buildNewEventEntity(eventToCreate,
+                        currentUser,
+                        getValidatedLocation));
+        return buildEventResponse(savedEvent);
     }
 
     @Transactional(readOnly = true)
     public EventFullInfo getEventById(Long eventId) {
-        var foundEvent = universalEventMapper.entityToDomain(eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found by id: %s".formatted(eventId))));
-        return universalEventMapper.domainToDto(foundEvent);
+        var foundEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found by id: %s".formatted(eventId)));
+        return buildEventResponse(foundEvent);
     }
 
     @Transactional
-    public void deleteEvent(Long eventId) {
+    public void closeEvent(Long eventId) {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         var toDeleteCandidate = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found by id: %s".formatted(eventId)));
@@ -72,61 +70,59 @@ public class EventService {
             eventRepository.changeEventStatus(eventId, EventStatus.CANCELLED);
             registrationRepository.closeAllRegistrations(toDeleteCandidate);
         } else {
-            throw new BadCredentialsException("Данный пользователь не может удалить событие");
+            throw new BadCredentialsException("Current user cannot close this event");
         }
     }
 
     @Transactional
     public EventFullInfo updateEvent(Long eventId, EventUpdateRequest eventToUpdate) {
-        checkAvailableLocationDate(eventToUpdate);
-        var oldEvent = checkCurrentUserCanModifyEvent(eventId);
-        checkEventValidation(oldEvent, eventToUpdate);
-        var event = EventEntity.builder()
-                .dateStart(eventToUpdate.date())
-                .name(eventToUpdate.name())
-                .location(universalLocationMapper.domainToEntity(locationService.getLocationById(eventToUpdate.locationId())))
-                .maxPlaces(eventToUpdate.maxPlaces())
-                .cost(eventToUpdate.cost())
-                .duration(eventToUpdate.duration())
-                .dateEnd(eventToUpdate.date().plusMinutes(eventToUpdate.duration()))
-                .status(oldEvent.getStatus())
-                .build();
+        checkLocationDateAvailability(eventToUpdate);
+        var event = checkCurrentUserCanModifyEvent(eventId);
+        //todo зарефакторить изменение сущности hibernate
+        checkEventValidation(event, eventToUpdate);
+        event.setDateStart(eventToUpdate.date());
+        event.setName(eventToUpdate.name());
+        event.setLocation(universalLocationMapper.domainToEntity(locationService.getLocationById(eventToUpdate.locationId())));
+        event.setMaxPlaces(eventToUpdate.maxPlaces());
+        event.setCost(eventToUpdate.cost());
+        event.setDuration(eventToUpdate.duration());
+        event.setDateEnd(eventToUpdate.date().plusMinutes(eventToUpdate.duration()));
+
         eventRepository.save(event);
-        return universalEventMapper.domainToDto(universalEventMapper.entityToDomain(event));
+        return buildEventResponse(event);
     }
 
     @Transactional
     public List<EventFullInfo> getUserEvents() {
         var currentUser = authenticationService.getCurrentAuthenticatedUser();
         return eventRepository.findAllUserEvents(currentUser.getId()).stream()
-                .map(universalEventMapper::entityToDomain)
-                .map(universalEventMapper::domainToDto)
+                .map(this::buildEventResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<EventFullInfo> searchByFilter(EventSearchFilter searchFilter) {
-        var foundEntities = eventRepository.findEvents(
-                searchFilter.name(),
-                searchFilter.placesMin(),
-                searchFilter.placesMax(),
-                searchFilter.dateStartAfter(),
-                searchFilter.dateStartBefore(),
-                searchFilter.costMin(),
-                searchFilter.costMax(),
-                searchFilter.durationMin(),
-                searchFilter.durationMax(),
-                searchFilter.locationId(),
-                searchFilter.eventStatus()
-        ).stream().map(universalEventMapper::entityToDomain).toList();
-        return foundEntities.stream()
-                .map(universalEventMapper::domainToDto)
+        return eventRepository.findEvents(
+                        searchFilter.name(),
+                        searchFilter.placesMin(),
+                        searchFilter.placesMax(),
+                        searchFilter.dateStartAfter(),
+                        searchFilter.dateStartBefore(),
+                        searchFilter.costMin(),
+                        searchFilter.costMax(),
+                        searchFilter.durationMin(),
+                        searchFilter.durationMax(),
+                        searchFilter.locationId(),
+                        searchFilter.eventStatus()
+                ).stream()
+                .map(this::buildEventResponse)
                 .toList();
     }
 
-    private EventFullInfo buildNewEventDto(EventEntity eventEntity) {
+    private EventFullInfo buildEventResponse(EventEntity eventEntity) {
         return EventFullInfo.builder()
-                .occupiedPlaces(0)
+                //todo решить проблему n+1 при запросе
+                .occupiedPlaces(registrationRepository.countRegistrations(eventEntity.getId()))
                 .date(eventEntity.getDateStart())
                 .duration(eventEntity.getDuration())
                 .cost(eventEntity.getCost())
@@ -176,19 +172,17 @@ public class EventService {
         return event;
     }
 
-    private void checkAvailableLocationDate(EventRequestToCreate event) {
-        var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
-        if (!events.isEmpty()) {
+    private void checkLocationDateAvailability(EventRequestToCreate event) {
+        var events = eventRepository.checkIfLocationDateReserved(event.date(), event.date().plusMinutes(event.duration()), event.locationId(), EventStatus.CANCELLED);
+        if (events != 0) {
             throw new IllegalArgumentException("Location already reserved at this date");
         }
     }
 
-    private void checkAvailableLocationDate(EventUpdateRequest event) {
-        var events = eventRepository.findEventByDate(event.date(), event.date().plusMinutes(event.duration()), event.locationId());
-        if (events.size() == 1) {
-            return;
-        }
-        if (!events.isEmpty()) {
+    private void checkLocationDateAvailability(EventUpdateRequest event) {
+        var events = eventRepository.checkIfLocationDateReserved(event.date(), event.date().plusMinutes(event.duration()), event.locationId(), EventStatus.CANCELLED);
+        //todo проверить, что это именно наше событие
+        if (events != 1) {
             throw new IllegalArgumentException("Location already reserved at this date");
         }
     }
@@ -198,5 +192,14 @@ public class EventService {
         if (eventCapacity > location.capacity()) {
             throw new IllegalArgumentException("Capacity of location is smaller than capacity of event");
         }
+    }
+
+    private Location getValidatedLocation(Long locationId, Long requiredPlaces) {
+
+        var locationInfo = locationService.getLocationById(locationId);
+        if (locationInfo.capacity() < requiredPlaces) {
+            throw new IllegalArgumentException("Capacity of location is: %s, but maxPlaces is: %s".formatted(locationInfo.capacity(), requiredPlaces));
+        }
+        return locationInfo;
     }
 }

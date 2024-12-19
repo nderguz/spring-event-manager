@@ -5,6 +5,7 @@ import org.example.eventmanager.events.db.model.RegistrationEntity;
 import org.example.eventmanager.events.domain.model.EventStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -34,19 +35,20 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("eventId") Long eventId
     );
 
-
     @Query("""
-            SELECT e FROM EventEntity e
+            SELECT count(e)
+            FROM EventEntity e
             WHERE (e.location.Id = :location_id)
             AND (e.dateStart < :date_end)
             AND (e.dateEnd > :date_start)
+            AND (e.status != :event_status)
             """)
-    List<EventEntity> findEventByDate(
+    Integer checkIfLocationDateReserved(
             @Param("date_start") LocalDateTime start,
             @Param("date_end") LocalDateTime end,
-            @Param("location_id") Long locationId
-    );
-
+            @Param("location_id") Long locationId,
+            @Param("event_status") EventStatus eventStatus
+        );
 
     @Query("""
             SELECT e FROM EventEntity e

@@ -2,10 +2,7 @@ package org.example.eventmanager.events.db.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.eventmanager.events.domain.model.EventStatus;
 import org.example.eventmanager.location.db.LocationEntity;
 import org.example.eventmanager.users.db.UserEntity;

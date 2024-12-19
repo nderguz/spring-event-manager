@@ -1357,7 +1357,7 @@ components:
         name: Лекция по Java
         id: 42
         ownerId: "10"
-        status: WAIT_START
+        status: WAITING
       properties:
         id:
           example: 42
@@ -1411,17 +1411,17 @@ components:
       type: object
     EventStatus:
       description: |-
-        * WAIT_START - мероприятие ожидает начала. Доступные новые регистрации в этом состоянии.
+        * WAITING - мероприятие ожидает начала. Доступные новые регистрации в этом состоянии.
         В этом состоянии еще возможно отменить мероприятие (перевести в статус CANCELLED), в остальных - нельзя.
         * STARTED - мероприятие началось. Новые регистрации недоступны на мероприятие.
         * CANCELLED - мероприятие отменено организтором. Новые регистрации недоступны на мероприятие.
         * FINISHED - мероприятие окончилось. Новые регистрации недоступны на мероприятие.
       enum:
-      - WAIT_START
+      - WAITING
       - STARTED
       - CLOSED
       - FINISHED
-      example: WAIT_START
+      example: WAITING
       type: string
     EventCreateRequestDto:
       description: Объект с данными для создания нового мероприятия.
@@ -1515,7 +1515,7 @@ components:
         dateStartBefore: 2000-01-23T04:56:07.000+00:00
         placesMin: 10
         locationId: 5
-        eventStatus: WAIT_START
+        eventStatus: WAITING
         name: Лекция
         placesMax: 100
         costMin: 1000

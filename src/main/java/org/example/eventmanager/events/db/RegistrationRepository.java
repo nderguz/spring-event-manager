@@ -14,21 +14,18 @@ import java.util.Optional;
 @Repository
 public interface RegistrationRepository extends CrudRepository<RegistrationEntity, Long> {
 
-    @Transactional
     @Query("SELECT r FROM RegistrationEntity r WHERE r.userId = :user_id and r.event.id = :event_id")
     Optional<RegistrationEntity> findUserRegistration(
             @Param("user_id") Long userId,
             @Param("event_id") Long eventId
     );
 
-    @Transactional
     @Query("SELECT r.event FROM RegistrationEntity r WHERE r.userId = :user_id")
     List<EventEntity> findUserEvents(
             @Param("user_id") Long userId
     );
 
     @Modifying
-    @Transactional
     @Query("UPDATE RegistrationEntity SET registrationStatus = \"CLOSED\" WHERE userId = :user_id AND event = :event")
     void closeRegistration(
             @Param("user_id") Long userId,
@@ -36,9 +33,15 @@ public interface RegistrationRepository extends CrudRepository<RegistrationEntit
     );
 
     @Modifying
-    @Transactional
     @Query("UPDATE RegistrationEntity SET registrationStatus = \"CLOSED\" WHERE event = :event")
     void closeAllRegistrations(
             @Param("event") EventEntity event
     );
+
+    @Query("""
+    SELECT count(r)
+    FROM RegistrationEntity r
+    WHERE r.event.id = :eventId
+""")
+    Integer countRegistrations(@Param("eventId") Long eventId);
 }
