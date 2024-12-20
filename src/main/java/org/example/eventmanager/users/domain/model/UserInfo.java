@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.domain;
+package org.example.eventmanager.users.domain.model;
 
 import lombok.*;
 import org.example.eventmanager.security.entities.Roles;
@@ -6,7 +6,7 @@ import org.example.eventmanager.security.entities.Roles;
 @AllArgsConstructor
 @Builder
 @Data
-public class User{
+public class UserInfo {
     private Long id;
     private String login;
     private String passwordHash;

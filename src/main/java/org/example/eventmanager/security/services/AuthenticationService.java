@@ -2,7 +2,7 @@ package org.example.eventmanager.security.services;
 
 import lombok.AllArgsConstructor;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.example.eventmanager.users.domain.UserService;
 import org.example.eventmanager.security.entities.SignInRequest;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,7 +22,7 @@ public class AuthenticationService {
             throw new BadCredentialsException("Введено некорректное имя пользователя");
         }
 
-        var user = userService.getUserByLogin(signInRequest.login());
+        var user = userService.getUserInfo(signInRequest.login());
 
         if(!passwordEncoder.matches(signInRequest.password(), user.getPasswordHash())){
            throw new BadCredentialsException("Введен некорректный пароль");
@@ -31,11 +31,11 @@ public class AuthenticationService {
         return jwtTokenManager.generateToken(user);
     }
 
-    public User getCurrentAuthenticatedUser(){
+    public UserInfo getCurrentAuthenticatedUser(){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null){
             throw new IllegalStateException("Authentication not present");
         }
-        return (User) authentication.getPrincipal();
+        return (UserInfo) authentication.getPrincipal();
     }
 }

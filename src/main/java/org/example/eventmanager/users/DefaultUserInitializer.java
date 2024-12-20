@@ -3,7 +3,7 @@ package org.example.eventmanager.users;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.example.eventmanager.security.entities.Roles;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.example.eventmanager.users.domain.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class DefaultUserInitializer {
             return;
         }
         var hashedPass = passwordEncoder.encode(password);
-        var user = User.builder()
+        var user = UserInfo.builder()
                 .login(login)
                 .passwordHash(hashedPass)
                 .age(21)

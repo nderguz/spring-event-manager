@@ -1,7 +1,7 @@
 package org.example.eventmanager.unit.domain;
 
 import org.example.eventmanager.security.entities.Roles;
-import org.example.eventmanager.users.db.UserEntity;
+import org.example.eventmanager.users.db.model.UserEntity;
 import org.example.eventmanager.users.db.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class UserRepositoryTests {
+public class UserInfoRepositoryTests {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");

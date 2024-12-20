@@ -12,12 +12,12 @@ import org.example.eventmanager.events.db.RegistrationRepository;
 import org.example.eventmanager.events.db.model.EventEntity;
 import org.example.eventmanager.events.domain.model.EventStatus;
 import org.example.eventmanager.location.UniversalLocationMapper;
-import org.example.eventmanager.location.domain.Location;
+import org.example.eventmanager.location.api.Location;
 import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.example.eventmanager.users.UniversalUserMapper;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +82,7 @@ public class EventService {
         checkEventValidation(event, eventToUpdate);
         event.setDateStart(eventToUpdate.date());
         event.setName(eventToUpdate.name());
-        event.setLocation(universalLocationMapper.domainToEntity(locationService.getLocationById(eventToUpdate.locationId())));
+        event.setLocation(universalLocationMapper.buildEntity(locationService.getLocationById(eventToUpdate.locationId())));
         event.setMaxPlaces(eventToUpdate.maxPlaces());
         event.setCost(eventToUpdate.cost());
         event.setDuration(eventToUpdate.duration());
@@ -148,9 +148,9 @@ public class EventService {
         }
     }
 
-    private EventEntity buildNewEventEntity(EventRequestToCreate eventToCreate, User user, Location location) {
+    private EventEntity buildNewEventEntity(EventRequestToCreate eventToCreate, UserInfo user, Location location) {
         return EventEntity.builder()
-                .location(universalLocationMapper.domainToEntity(location))
+                .location(universalLocationMapper.buildEntity(location))
                 .name(eventToCreate.name())
                 .status(EventStatus.WAITING)
                 .owner(universalUserMapper.domainToEntity(user))
