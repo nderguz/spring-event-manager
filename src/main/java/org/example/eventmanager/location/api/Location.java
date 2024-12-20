@@ -5,9 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+
 @Builder
-public record LocationDto(
-        Long Id,
+public record Location (
+        Long id,
 
         @NotBlank(message = "Location name cannot be empty")
         String name,
@@ -20,5 +21,5 @@ public record LocationDto(
         Long capacity,
 
         String description
-) {
+){
 }

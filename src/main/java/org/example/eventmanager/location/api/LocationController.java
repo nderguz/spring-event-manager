@@ -3,7 +3,6 @@ package org.example.eventmanager.location.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.eventmanager.location.UniversalLocationMapper;
 import org.example.eventmanager.location.domain.LocationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,45 +16,39 @@ import java.util.List;
 public class LocationController {
 
     private final LocationService locationService;
-    private final UniversalLocationMapper universalLocationMapper;
 
     @GetMapping
-    public ResponseEntity<List<LocationDto>> getAllLocations() {
-        var locationsList = locationService.getLocations().stream().map(universalLocationMapper::domainToDto).toList();
-        return ResponseEntity.ok(locationsList);
+    public ResponseEntity<List<Location>> getAllLocations() {
+        return ResponseEntity.ok(locationService.getLocations());
     }
 
     @PostMapping
-    public ResponseEntity<LocationDto> createLocation(
-            @RequestBody @Valid LocationDto locationDto
+    public ResponseEntity<Location> createLocation(
+            @RequestBody @Valid Location locationDto
     ) {
-        var createdLocation = locationService.createLocation(universalLocationMapper.dtoToDomain(locationDto));
         return ResponseEntity.status(201)
-                .body(universalLocationMapper.domainToDto(createdLocation));
+                .body(locationService.createLocation(locationDto));
     }
 
     @DeleteMapping("/{locationId}")
-    public ResponseEntity<LocationDto> deleteLocation(
+    public ResponseEntity<Location> deleteLocation(
             @PathVariable Long locationId
     ) {
-        var deletedLocation = locationService.deleteLocation(locationId);
-        return ResponseEntity.status(204).body(universalLocationMapper.domainToDto(deletedLocation));
+        return ResponseEntity.status(204).body(locationService.deleteLocation(locationId));
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<LocationDto> getLocation(
+    public ResponseEntity<Location> getLocation(
             @PathVariable Long locationId
     ) {
-        var foundLocation = universalLocationMapper.domainToDto(locationService.getLocationById(locationId));
-        return ResponseEntity.ok(foundLocation);
+        return ResponseEntity.ok(locationService.getLocationById(locationId));
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<LocationDto> updateLocation(
+    public ResponseEntity<Location> updateLocation(
             @PathVariable Long locationId,
-            @RequestBody @Valid LocationDto locationDto
+            @RequestBody @Valid Location locationDto
     ) {
-        var updatedLocation = locationService.updateLocation(locationId, universalLocationMapper.dtoToDomain(locationDto));
-        return ResponseEntity.ok(universalLocationMapper.domainToDto(updatedLocation));
+        return ResponseEntity.ok(locationService.updateLocation(locationId, locationDto));
     }
 }
