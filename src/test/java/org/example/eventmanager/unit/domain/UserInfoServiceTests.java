@@ -107,7 +107,7 @@ class UserInfoServiceTests {
         when(userMapper.entityToDomain(validUserEntity)).thenReturn(validUser);
 
         var savedUser = userService.saveUser(validUser);
-        assertEquals(validUser.getLogin(), savedUser.getLogin());
+        assertEquals(validUser.getLogin(), savedUser.login());
     }
 
     @Test
@@ -135,7 +135,7 @@ class UserInfoServiceTests {
 
         var foundUser = userService.getUserByLogin("validUserLogin");
 
-        assertEquals(validUser.getLogin(), foundUser.getLogin());
+        assertEquals(validUser.getLogin(), foundUser.login());
     }
 
     @Test
