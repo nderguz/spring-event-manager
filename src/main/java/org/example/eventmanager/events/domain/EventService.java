@@ -17,7 +17,7 @@ import org.example.eventmanager.location.domain.LocationService;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.security.services.AuthenticationService;
 import org.example.eventmanager.users.UniversalUserMapper;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,7 +148,7 @@ public class EventService {
         }
     }
 
-    private EventEntity buildNewEventEntity(EventRequestToCreate eventToCreate, User user, Location location) {
+    private EventEntity buildNewEventEntity(EventRequestToCreate eventToCreate, UserInfo user, Location location) {
         return EventEntity.builder()
                 .location(universalLocationMapper.buildEntity(location))
                 .name(eventToCreate.name())

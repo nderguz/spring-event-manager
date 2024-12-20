@@ -1,4 +1,4 @@
-package org.example.eventmanager.users.db;
+package org.example.eventmanager.users.db.model;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.eventmanager.events.domain.model.EventStatus;
 import org.example.eventmanager.location.db.LocationEntity;
-import org.example.eventmanager.users.db.UserEntity;
+import org.example.eventmanager.users.db.model.UserEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

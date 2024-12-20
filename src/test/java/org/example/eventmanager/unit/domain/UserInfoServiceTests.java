@@ -2,9 +2,9 @@ package org.example.eventmanager.unit.domain;
 
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.UniversalUserMapper;
-import org.example.eventmanager.users.db.UserEntity;
+import org.example.eventmanager.users.db.model.UserEntity;
 import org.example.eventmanager.users.db.UserRepository;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.example.eventmanager.users.domain.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTests {
+class UserInfoServiceTests {
 
     @Mock
     private UserRepository userRepository;
@@ -89,7 +89,7 @@ class UserServiceTests {
             @Tag("positive")
     })
     void saveNewValidUserToDb(){
-        var validUser = User.builder()
+        var validUser = UserInfo.builder()
                 .role(Roles.USER)
                 .age(21)
                 .passwordHash("hashedPassword")
@@ -117,7 +117,7 @@ class UserServiceTests {
             @Tag("positive")
     })
     void getValidUserByLogin(){
-        var validUser = User.builder()
+        var validUser = UserInfo.builder()
                 .role(Roles.USER)
                 .age(21)
                 .passwordHash("hashedPassword")

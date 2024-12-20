@@ -2,7 +2,7 @@ package org.example.eventmanager.security.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.example.eventmanager.users.domain.User;
+import org.example.eventmanager.users.domain.model.UserInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,7 +25,7 @@ public class JwtTokenManager {
         this.tokenLifeTime = tokenLifeTime;
     }
 
-    public String generateToken(User user) {
+    public String generateToken(UserInfo user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
         Date issuedTime = new Date();

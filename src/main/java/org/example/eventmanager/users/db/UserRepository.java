@@ -1,6 +1,6 @@
 package org.example.eventmanager.users.db;
 
-import jakarta.transaction.Transactional;
+import org.example.eventmanager.users.db.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
