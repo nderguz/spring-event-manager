@@ -10,6 +10,7 @@ import org.example.eventmanager.users.UniversalUserMapper;
 import org.example.eventmanager.users.api.model.UserResponse;
 import org.example.eventmanager.users.db.UserRepository;
 import org.example.eventmanager.users.domain.model.UserInfo;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+
     private final UserRepository userRepository;
     private final UniversalUserMapper universalUserMapper;
     private final PasswordEncoder passwordEncoder;
