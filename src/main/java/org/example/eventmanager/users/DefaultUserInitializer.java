@@ -2,14 +2,16 @@ package org.example.eventmanager.users;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.eventmanager.security.entities.Roles;
 import org.example.eventmanager.users.domain.model.UserInfo;
 import org.example.eventmanager.users.domain.UserService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DefaultUserInitializer {
 
     private final UserService userService;

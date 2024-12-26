@@ -1,17 +1,19 @@
 package org.example.eventmanager.security.services;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.eventmanager.security.jwt.JwtTokenManager;
 import org.example.eventmanager.users.domain.model.UserInfo;
 import org.example.eventmanager.users.domain.UserService;
 import org.example.eventmanager.security.entities.SignInRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthenticationService {
     private final JwtTokenManager jwtTokenManager;
     private final UserService userService;
